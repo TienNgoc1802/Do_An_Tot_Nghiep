@@ -18,6 +18,14 @@ import { Toaster } from "react-hot-toast";
 import Search from "./pages/user/Search";
 import CheckOut from "./pages/user/CheckOut";
 import Account from "./pages/user/Account";
+import Dashboard from "./pages/admin/Dashboard";
+import Category from "./pages/admin/Category";
+import Order from "./pages/admin/Order";
+import OrderDetail from "./pages/admin/OrderDetail";
+import User from "./pages/admin/User";
+import AddUser from "./pages/admin/AddUser";
+import EditUser from "./pages/admin/EditUser";
+import Promotion from "./pages/admin/Promotion";
 
 const App = () => {
 	return (
@@ -33,12 +41,15 @@ const App = () => {
 const AppContent = () => {
 	const location = useLocation();
 	const isSignInPage =
-		location.pathname === "/signin" || location.pathname === "/signup" || location.pathname === "/checkout";
+		location.pathname === "/signin" ||
+		location.pathname === "/signup" ||
+		location.pathname === "/checkout";
+	const isAdminPage = location.pathname.startsWith("/admin");
 
 	return (
 		<>
 			{window.scrollTo(0, 0)}
-			{!isSignInPage && <Header currentPage="home" />}
+			{!isSignInPage && !isAdminPage && <Header currentPage="home" />}
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/home" element={<Home />} />
@@ -57,8 +68,19 @@ const AppContent = () => {
 				<Route path="/search" element={<Search />} />
 				<Route path="/checkout" element={<CheckOut />} />
 				<Route path="/account" element={<Account />} />
+				<Route path="/admin">
+                    <Route path="dashboard" element={<Dashboard />} />
+					<Route path="category" element={<Category />} />
+					<Route path="order" element={<Order />} />
+					<Route path="order-detail/:order_id" element={<OrderDetail />} />
+					<Route path="order" element={<Order />} />
+                    <Route path="users" element={<User />} />
+					<Route path="users/add-user" element={<AddUser />} />
+					<Route path="users/edit-user/:user_id" element={<EditUser />} />
+					<Route path="promotion" element={<Promotion />} />
+                </Route>
 			</Routes>
-			{!isSignInPage && <Footer />}
+			{!isSignInPage && !isAdminPage && <Footer />}
 		</>
 	);
 };

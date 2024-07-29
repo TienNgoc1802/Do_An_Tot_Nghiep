@@ -10,6 +10,7 @@ const ModalAddToCart = ({ isOpen, onClose, product, setIsModalOpen }) => {
 	const { user, setTotalProductInCart } = useContext(AppContext);
 
 	useEffect(() => {
+		setQuantity(1);
 		if (product.productSize && product.productSize.length > 0) {
 			setSize(product.productSize[0].size);
 		}

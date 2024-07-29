@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/image/logo_shop.png";
@@ -12,17 +12,21 @@ const SignIn = () => {
 	const [errorLogin, setErrorLogin] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const navigate = useNavigate();
-	const {setUser, setTotalProductInCart } = useContext(AppContext);
+	const { setUser, setTotalProductInCart } = useContext(AppContext);
 
 	const handleSignIn = async (e) => {
 		e.preventDefault();
 		try {
 			const data = await UserService.login(loginName, password);
 			if (data) {
-				sessionStorage.setItem("user", JSON.stringify(data));
-				setUser(data);
-				setTotalProductInCart(data.cart.length);
-				navigate("/home");
+				if (data.role === "user") {
+					sessionStorage.setItem("user", JSON.stringify(data));
+					setUser(data);
+					setTotalProductInCart(data.cart.length);
+					navigate("/home");
+				}else{
+					
+				}
 			} else {
 				setErrorLogin("Tài khoản hoặc mật khẩu không chính xác");
 				setTimeout(() => setErrorLogin(null), 2000);
@@ -133,9 +137,9 @@ const SignIn = () => {
 												Nhớ tài khoản
 											</label>
 										</div> */}
-										<Link to="/forgotpassword" className="text-info">
+										<span className="text-info" style={{ cursor: "pointer" }}>
 											Quên mật khẩu?
-										</Link>
+										</span>
 									</div>
 									{errorLogin && <p style={{ color: "red" }}>{errorLogin}</p>}
 									<div className="form-group my-3">

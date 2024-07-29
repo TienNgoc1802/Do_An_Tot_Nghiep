@@ -54,7 +54,7 @@ const ModalSuccess = ({ isOpen }) => {
 						style={{ padding: "20px", textAlign: "center" }}
 					>
 						<img src={success} alt="Success Icon"></img>
-						<h3 className="fw-bold my-3" style={{ color: "#FF6600" }}>
+						<h3 className="fw-bold my-3" style={{ color: "#FF6600"}}>
 							Đặt hàng thành công
 						</h3>
 						<p>

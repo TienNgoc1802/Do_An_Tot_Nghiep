@@ -12,6 +12,21 @@ const Shop = () => {
 	const [page, setPage] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [selectedCategory, setSelectedCategory] = useState(null);
+	const [selectedSortOption, setSelectedSortOption] = useState(null);
+	const [selectedPriceRange, setSelectedPriceRange] = useState(null);
+
+	const priceRanges = {
+		"under-1000000": { min: 0, max: 1000000 },
+		"1000000-2000000": { min: 1000000, max: 2000000 },
+		"2000000-3000000": { min: 2000000, max: 3000000 },
+		"above-3000000": { min: 3000000, max: 10000000 },
+	};
+
+	const { min, max } = priceRanges[selectedPriceRange] || {
+		min: null,
+		max: null,
+	};
 
 	useEffect(() => {
 		const fetchCategories = async () => {
@@ -27,12 +42,28 @@ const Shop = () => {
 	}, []);
 
 	useEffect(() => {
+		// Khi `selectedSortOption` thay đổi, đặt lại số trang về 0 nếu lớn hơn 0
+		if (page > 0) {
+			setPage(0);
+		}
+	}, [selectedSortOption, selectedPriceRange, selectedCategory]);
+
+	useEffect(() => {
 		const fetchProductPagination = async () => {
 			setLoading(true);
 			try {
-				const data = await productService.getProductsWithPagination(page, 12);
+				const data = await productService.filterProduct(
+					selectedCategory,
+					min,
+					max,
+					selectedSortOption,
+					page,
+					12
+				);
 				setProductPagination(data);
-				setProducts((prev) => [...prev, ...(data.content || [])]);
+				setProducts((prev) =>
+					page === 0 ? data.content : [...prev, ...data.content]
+				);
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -41,7 +72,7 @@ const Shop = () => {
 		};
 
 		fetchProductPagination();
-	}, [page]);
+	}, [page, selectedCategory, selectedSortOption, selectedPriceRange]);
 
 	if (!categories || !productPagination) {
 		return <div className="fs-1 text-danger">Loading...</div>;
@@ -97,19 +128,20 @@ const Shop = () => {
 											{categories.map((category, index) => (
 												<li key={index}>
 													<input
-														type="checkbox"
+														type="radio"
 														className="checkbox-item"
+														name="category"
+														value={category.category_Name}
+														checked={
+															selectedCategory === category.category_Name
+														}
+														onChange={(e) =>
+															setSelectedCategory(e.target.value)
+														}
 													></input>
 													<label htmlFor="">{category.category_Name}</label>
 												</li>
 											))}
-											<li key="orther">
-												<input
-													type="checkbox"
-													className="checkbox-item"
-												></input>
-												<label htmlFor="">Khác</label>
-											</li>
 										</ul>
 									</div>
 								</div>
@@ -128,31 +160,55 @@ const Shop = () => {
 										<ul className="checkbox-list">
 											<li>
 												<input
-													type="checkbox"
+													type="radio"
 													className="checkbox-item"
-												></input>
-												<label htmlFor="">Dưới 1.000.000₫</label>
+													name="priceRange"
+													value="under-1000000"
+													checked={selectedPriceRange === "under-1000000"}
+													onChange={(e) =>
+														setSelectedPriceRange(e.target.value)
+													}
+												/>
+												<label>Dưới 1.000.000₫</label>
 											</li>
 											<li>
 												<input
-													type="checkbox"
+													type="radio"
 													className="checkbox-item"
-												></input>
-												<label htmlFor="">1.000.000₫ - 2.000.000₫</label>
+													name="priceRange"
+													value="1000000-2000000"
+													checked={selectedPriceRange === "1000000-2000000"}
+													onChange={(e) =>
+														setSelectedPriceRange(e.target.value)
+													}
+												/>
+												<label>1.000.000₫ - 2.000.000₫</label>
 											</li>
 											<li>
 												<input
-													type="checkbox"
+													type="radio"
 													className="checkbox-item"
-												></input>
-												<label htmlFor="">2.000.000₫ - 3.000.000₫</label>
+													name="priceRange"
+													value="2000000-3000000"
+													checked={selectedPriceRange === "2000000-3000000"}
+													onChange={(e) =>
+														setSelectedPriceRange(e.target.value)
+													}
+												/>
+												<label>2.000.000₫ - 3.000.000₫</label>
 											</li>
 											<li>
 												<input
-													type="checkbox"
+													type="radio"
 													className="checkbox-item"
-												></input>
-												<label htmlFor="">Trên 3.000.000₫</label>
+													name="priceRange"
+													value="above-3000000"
+													checked={selectedPriceRange === "above-3000000"}
+													onChange={(e) =>
+														setSelectedPriceRange(e.target.value)
+													}
+												/>
+												<label>Trên 3.000.000₫</label>
 											</li>
 										</ul>
 									</div>
@@ -172,35 +228,44 @@ const Shop = () => {
 										<ul className="checkbox-list">
 											<li>
 												<input
-													type="checkbox"
+													type="radio"
 													className="checkbox-item"
-												></input>
-												<label htmlFor="">Giá: Tăng dần</label>
+													name="sortOrder"
+													value="asc"
+													checked={selectedSortOption === "asc"}
+													onChange={(e) =>
+														setSelectedSortOption(e.target.value)
+													}
+												/>
+												<label>Giá: Tăng dần</label>
 											</li>
 											<li>
 												<input
-													type="checkbox"
+													type="radio"
 													className="checkbox-item"
-												></input>
-												<label htmlFor="">Giá: Giảm dần</label>
-											</li>
-											<li>
-												<input
-													type="checkbox"
-													className="checkbox-item"
-												></input>
-												<label htmlFor="">Tên: A-Z</label>
-											</li>
-											<li>
-												<input
-													type="checkbox"
-													className="checkbox-item"
-												></input>
-												<label htmlFor="">Tên: Z-A</label>
+													name="sortOrder"
+													value="desc"
+													checked={selectedSortOption === "desc"}
+													onChange={(e) =>
+														setSelectedSortOption(e.target.value)
+													}
+												/>
+												<label>Giá: Giảm dần</label>
 											</li>
 										</ul>
 									</div>
 								</div>
+								<button
+									onClick={() => {
+										setSelectedCategory(null);
+										setSelectedPriceRange(null);
+										setSelectedSortOption(null);
+									}}
+									className="btn btn-info text-light py-2"
+									style={{ width: "301.25px" }}
+								>
+									Xóa bộ lọc
+								</button>
 							</div>
 						</div>
 						<div className="col-lg-9 col-9">
@@ -219,6 +284,9 @@ const Shop = () => {
 												</span>
 											</div>
 										</div>
+										{productPagination.totalElements === 0 && (
+											<p>Không tìm thấy kết quả. Vui lòng thử lại!</p>
+										)}
 									</div>
 								</div>
 								<div className="container-fluid list-product">

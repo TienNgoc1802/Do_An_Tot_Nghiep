@@ -45,7 +45,7 @@ const Home = () => {
 		fetchProductIsOnSale();
 	}, []);
 
-	if (!newArrivals || !bestSellers) {
+	if (!newArrivals || !bestSellers || !productIsOnSale) {
 		return <div className="fs-1 text-danger">Loading...</div>;
 	}
 

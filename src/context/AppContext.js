@@ -6,7 +6,8 @@ export const AppContext = createContext({});
 export const AppProvider = ({ children }) => {
 	const [totalProductInCart, setTotalProductInCart] = useState(0);
 	const [user, setUser] = useState(null);
-	const [searchContent, setSearchContent] = useState("  ");
+	const [admin, setAdmin] = useState(null);
+	const [searchContent, setSearchContent] = useState("   ");
 
 	const fetchListCart = async (id) => {
 		try {
@@ -35,6 +36,8 @@ export const AppProvider = ({ children }) => {
 				setTotalProductInCart,
 				searchContent,
 				setSearchContent,
+				admin,
+				setAdmin,
 			}}
 		>
 			{children}
