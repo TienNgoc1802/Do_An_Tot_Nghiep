@@ -479,7 +479,7 @@ ul {
 
 .product-images-slider-thumbs .image-slide {
 	width: 75px;
-	height: auto;
+	height: 75px;
 }
 
 /* ------ Product Detail ------ */
@@ -862,6 +862,3 @@ ul {
 	padding-top: 15px;
 	padding-bottom: 10px;
 }
-
-
-

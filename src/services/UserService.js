@@ -138,3 +138,56 @@ export const editUser = async (
 
 	return res.data;
 };
+
+export const forgotPassword = async (id) => {
+	const params = new URLSearchParams();
+	params.append("id", id);
+	const res = await userRequest.post("/forgot", params);
+
+	return res.data;
+};
+
+export const ChangePasswordAdmin = async (id, newPassword) => {
+	const params = new URLSearchParams();
+	params.append("id", id);
+	params.append("password", newPassword);
+	const res = await userRequest.post("/changepasswordadmin", params);
+	return res.data;
+};
+
+export const forgotPasswordAdmin = async (id) => {
+	const params = new URLSearchParams();
+	params.append("id", id);
+	const res = await userRequest.post("/forgotadmin", params);
+
+	return res.data;
+};
+
+export const updateProfileAdmin = async (
+	id,
+	avatar,
+	fullname,
+	email,
+	phoneNumber,
+	address
+) => {
+	const formData = new FormData();
+	formData.append("id", id);
+	if (avatar) {
+		const response = await fetch(avatar);
+		const blob = await response.blob();
+		formData.append("avatar", blob, "avatar.jpg");
+	}
+	formData.append("fullname", fullname);
+	formData.append("email", email);
+	formData.append("phoneNumber", phoneNumber);
+	formData.append("address", address);
+
+	const res = await userRequest.post("/updateadmin", formData, {
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	});
+	return res.data;
+};
+

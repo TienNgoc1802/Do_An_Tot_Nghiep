@@ -7,7 +7,7 @@ export const userRequest = axios.create({
 
 export const productRequest = axios.create({
 	baseURL: "http://localhost:8090/api/v1/products",
-	timeout: 5000,
+	timeout: 30000,
 });
 
 export const categroyRequest = axios.create({
@@ -27,5 +27,10 @@ export const promotionRequest = axios.create({
 
 export const orderRequest = axios.create({
 	baseURL: "http://localhost:8090/api/v1/order",
+	timeout: 5000,
+});
+
+export const statisticalRequest = axios.create({
+	baseURL: "http://localhost:8090/api/v1/statistical",
 	timeout: 5000,
 });

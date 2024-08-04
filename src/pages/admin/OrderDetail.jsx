@@ -97,12 +97,12 @@ const OrderDetail = () => {
 				style={{ padding: "15px 20px", flex: "1" }}
 			>
 				<div className="d-flex justify-content-between align-items-center">
-				<h3 className="fw-bold">Chi tiết đơn hàng (#{order_id})</h3>
+					<h3 className="fw-bold">Chi tiết đơn hàng (#{order_id})</h3>
 					<Link to="/admin/order" className="text-info">
 						<i className="bi bi-chevron-double-left"></i> Quay lại
 					</Link>
 				</div>
-				
+
 				<div
 					className="mt-4"
 					style={{
@@ -115,7 +115,14 @@ const OrderDetail = () => {
 					<div className="order-info mb-2">
 						<div className="d-flex justify-content-between align-items-center mb-3">
 							<p className="fw-bold">
-								Thông tin đơn hàng (Người dùng: {orderDetail.user.id})
+								Thông tin đơn hàng (Người dùng:{" "}
+								<Link
+									to={`/admin/users/edit-user/${orderDetail.user.id}`}
+									className="text-dark"
+								>
+									{orderDetail.user.id}
+								</Link>
+								)
 							</p>
 							<p>
 								<strong>Ngày đặt hàng: </strong>
@@ -239,7 +246,7 @@ const OrderDetail = () => {
 										color: `${handleStatus(orderDetail.status)}`,
 										padding: "10px",
 										borderRadius: "4px",
-                                        fontWeight: "600",
+										fontWeight: "600",
 									}}
 								>
 									<span>

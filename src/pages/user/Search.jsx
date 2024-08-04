@@ -15,6 +15,10 @@ const Search = () => {
 
 	useEffect(() => {
 		const fetchSearchProduct = async () => {
+			if (!searchContent || searchContent.trim() === "") {
+				return;
+			}
+			
 			setLoading(true);
 			try {
 				const data = await productService.search(searchContent, page, 10);
@@ -30,13 +34,9 @@ const Search = () => {
 		fetchSearchProduct();
 	}, [page, searchContent]);
 
-	if (!productPagination) {
-		return <div className="fs-1 text-danger">Loading...</div>;
-	}
-
 	return (
 		<div>
-            <ModalAddToCart
+			<ModalAddToCart
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				product={product}
@@ -55,7 +55,7 @@ const Search = () => {
 						<h3 className="fw-bold mb-2">Tìm Kiếm</h3>
 						{products.length > 0 && (
 							<span>
-								Có <strong>{productPagination.totalElements} sản phẩm</strong>{" "}
+								Có <strong>{productPagination?.totalElements} sản phẩm</strong>{" "}
 								cho tìm kiếm
 							</span>
 						)}
@@ -231,7 +231,7 @@ const Search = () => {
 								))}
 							</div>
 						</div>
-						{page < productPagination.totalPages - 1 && (
+						{page < productPagination?.totalPages - 1 && (
 							<div className="d-flex justify-content-center align-items-center pt-3">
 								<button
 									className="btn-loadmore"

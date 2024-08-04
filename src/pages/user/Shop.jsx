@@ -41,12 +41,12 @@ const Shop = () => {
 		fetchCategories();
 	}, []);
 
-	useEffect(() => {
-		// Khi `selectedSortOption` thay đổi, đặt lại số trang về 0 nếu lớn hơn 0
-		if (page > 0) {
-			setPage(0);
-		}
-	}, [selectedSortOption, selectedPriceRange, selectedCategory]);
+	// useEffect(() => {
+	// 	// Khi `selectedSortOption` thay đổi, đặt lại số trang về 0 nếu lớn hơn 0
+	// 	if (page > 0) {
+	// 		setPage(0);
+	// 	}
+	// }, [selectedSortOption, selectedPriceRange, selectedCategory]);
 
 	useEffect(() => {
 		const fetchProductPagination = async () => {
@@ -61,9 +61,10 @@ const Shop = () => {
 					12
 				);
 				setProductPagination(data);
-				setProducts((prev) =>
-					page === 0 ? data.content : [...prev, ...data.content]
-				);
+				// setProducts((prev) =>
+				// 	page === 0 ? data.content : [...prev, ...data.content]
+				// );
+				setProducts(data.content);
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -77,6 +78,12 @@ const Shop = () => {
 	if (!categories || !productPagination) {
 		return <div className="fs-1 text-danger">Loading...</div>;
 	}
+
+	const handlePrev = () => {
+		if (page > 0) {
+			setPage(page - 1);
+		}
+	};
 
 	return (
 		<div>
@@ -434,7 +441,7 @@ const Shop = () => {
 									</div>
 								</div>
 
-								{page < productPagination.totalPages - 1 && (
+								{/* {page < productPagination.totalPages - 1 && (
 									<div className="d-flex justify-content-center align-items-center pt-2">
 										<button
 											className="btn-loadmore"
@@ -456,7 +463,32 @@ const Shop = () => {
 											</div>
 										)}
 									</div>
-								)}
+								)} */}
+								<div className="page d-flex justify-content-center align-items-center mt-3">
+									<nav
+										aria-label="Page navigation example"
+										style={{ cursor: "pointer" }}
+									>
+										<ul className="pagination">
+											<li className="page-item" onClick={handlePrev}>
+												<div className="page-link" aria-label="Previous">
+													<span aria-hidden="true">&laquo;</span>
+												</div>
+											</li>
+											<li className="page-item">
+												<div className="page-link">{page + 1}</div>
+											</li>
+											<li
+												className="page-item"
+												onClick={() => setPage(page + 1)}
+											>
+												<div className="page-link" aria-label="Next">
+													<span aria-hidden="true">&raquo;</span>
+												</div>
+											</li>
+										</ul>
+									</nav>
+								</div>
 							</div>
 						</div>
 					</div>

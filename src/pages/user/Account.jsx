@@ -420,7 +420,7 @@ const Account = () => {
 											</div>
 											<hr />
 											<div className="d-flex justify-content-end align-items-center mt-2">
-												{order.status == "Pending" && (
+												{(order.status !== "Completed" && order.status !== "Canceled") && (
 													<button
 														onClick={() => handleHuyDon(order.id)}
 														className="btn btn-danger px-3 py-2"

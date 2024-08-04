@@ -1,5 +1,11 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import {
+	BrowserRouter,
+	Routes,
+	Route,
+	useLocation,
+	useNavigate,
+} from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -13,7 +19,7 @@ import PolicySecurity from "./pages/user/PolicySecurity";
 import Warranty from "./pages/user/Warranty";
 import ReturnPolicy from "./pages/user/ReturnPolicy";
 import ShippingAndInspectionPolicy from "./pages/user/ShippingInspectionPolicy";
-import { AppProvider } from "./context/AppContext";
+import { AppContext, AppProvider } from "./context/AppContext";
 import { Toaster } from "react-hot-toast";
 import Search from "./pages/user/Search";
 import CheckOut from "./pages/user/CheckOut";
@@ -26,6 +32,14 @@ import User from "./pages/admin/User";
 import AddUser from "./pages/admin/AddUser";
 import EditUser from "./pages/admin/EditUser";
 import Promotion from "./pages/admin/Promotion";
+import AddPromotion from "./pages/admin/AddPromotion";
+import EditPromotion from "./pages/admin/EditPromotion";
+import Statistical from "./pages/admin/Statistical";
+import Product from "./pages/admin/Product";
+import AddProduct from "./pages/admin/AddProduct";
+import EditProduct from "./pages/admin/EditProduct";
+import LoginAdmin from "./pages/admin/LoginAdmin";
+import Profile from "./pages/admin/Profile";
 
 const App = () => {
 	return (
@@ -39,12 +53,26 @@ const App = () => {
 };
 
 const AppContent = () => {
+	const { admin, setAdmin } = useContext(AppContext);
 	const location = useLocation();
 	const isSignInPage =
 		location.pathname === "/signin" ||
 		location.pathname === "/signup" ||
 		location.pathname === "/checkout";
 	const isAdminPage = location.pathname.startsWith("/admin");
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		const storedAdmin = sessionStorage.getItem("admin");
+		if (storedAdmin) {
+			const adminData = JSON.parse(storedAdmin);
+			setAdmin(adminData);
+		}
+
+		else if(isAdminPage && !admin) {
+			navigate("/admin/login");
+		}
+	}, [isAdminPage, setAdmin, location.pathname]);
 
 	return (
 		<>
@@ -68,17 +96,28 @@ const AppContent = () => {
 				<Route path="/search" element={<Search />} />
 				<Route path="/checkout" element={<CheckOut />} />
 				<Route path="/account" element={<Account />} />
+				<Route path="/admin/login" element={<LoginAdmin />} />
 				<Route path="/admin">
-                    <Route path="dashboard" element={<Dashboard />} />
+					<Route path="dashboard" element={<Dashboard />} />
 					<Route path="category" element={<Category />} />
 					<Route path="order" element={<Order />} />
 					<Route path="order-detail/:order_id" element={<OrderDetail />} />
 					<Route path="order" element={<Order />} />
-                    <Route path="users" element={<User />} />
+					<Route path="users" element={<User />} />
 					<Route path="users/add-user" element={<AddUser />} />
 					<Route path="users/edit-user/:user_id" element={<EditUser />} />
 					<Route path="promotion" element={<Promotion />} />
-                </Route>
+					<Route path="promotion/add-promotion" element={<AddPromotion />} />
+					<Route
+						path="promotion/edit-promotion/:id"
+						element={<EditPromotion />}
+					/>
+					<Route path="statistical" element={<Statistical />} />
+					<Route path="products" element={<Product />} />
+					<Route path="products/add-product" element={<AddProduct />} />
+					<Route path="products/edit-product/:id" element={<EditProduct />} />
+					<Route path="profile" element={<Profile />} />
+				</Route>
 			</Routes>
 			{!isSignInPage && !isAdminPage && <Footer />}
 		</>

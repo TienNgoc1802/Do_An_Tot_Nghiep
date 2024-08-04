@@ -110,7 +110,7 @@ const Category = () => {
 					className="dashboard-content"
 					style={{ padding: "15px 20px", flex: "1" }}
 				>
-					<h3 className="fw-bold mb-4">Nhãn hàng</h3>
+					<h3 className="fw-bold mb-4">Quản Lý Nhãn Hàng</h3>
 					<button
 						className="btn btn-info text-light fw-bold mb-3"
 						onClick={() => {

@@ -4,6 +4,7 @@ import * as productService from "../../services/ProductService";
 import * as categoryService from "../../services/CategoryService";
 import * as userService from "../../services/UserService";
 import * as orderService from "../../services/OrderService";
+import * as statisticalService from "../../services/StatisticalService";
 import {
 	BarChart,
 	Bar,
@@ -13,6 +14,9 @@ import {
 	CartesianGrid,
 	ResponsiveContainer,
 	Label,
+	Legend,
+	LineChart,
+	Line,
 } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
@@ -23,6 +27,7 @@ const Dashboard = () => {
 	const [totalCategory, setTotalCategory] = useState(0);
 	const [totalUser, setTotalUser] = useState(0);
 	const [totalOrder, setTotalOrder] = useState(0);
+	const [revenueLast7Day, setRevenueLast7Day] = useState([]);
 	const [orderRecent, setOrderRecent] = useState(null);
 	const { admin, setAdmin } = useContext(AppContext);
 	const navigate = useNavigate();
@@ -81,7 +86,21 @@ const Dashboard = () => {
 		}
 	};
 
+	const fetchGetRevenueLast7DaysWithAllDates = async () => {
+		try {
+			const data = await statisticalService.getRevenueLast7DaysWithAllDates();
+			const formattedData = data.map((item) => ({
+				date: new Date(item[0]).toLocaleDateString(),
+				revenue: item[1],
+			}));
+			setRevenueLast7Day(formattedData);
+		} catch (error) {
+			console.log("Fetch revenue last 7 day fail.", error);
+		}
+	};
+
 	useEffect(() => {
+		fetchGetRevenueLast7DaysWithAllDates();
 		fetchGetOrderToday();
 		fetchGetAllUser();
 		fetchGetAllOrder();
@@ -207,14 +226,52 @@ const Dashboard = () => {
 									/>
 								</YAxis>
 								<Tooltip
-									formatter={(value, name) => [value, name]}
+									formatter={(value, name) => [
+										`${value.toLocaleString()} sản phẩm`,
+										"Đã bán",
+									]}
 									labelFormatter={(label) => `Sản phẩm: ${label}`}
 								/>
 								<Bar dataKey="sold" fill="#8884d8" />
 							</BarChart>
 						</ResponsiveContainer>
 					</div>
-					<div style={{ flex: "1" }}></div>
+					<div
+						className="chart-item px-2"
+						style={{ flex: "1", background: "#fff", borderRadius: "10px" }}
+					>
+						<h5 style={{ textAlign: "center", marginBottom: "20px" }}>
+							Doanh thu 7 ngày gần nhất
+						</h5>
+						<ResponsiveContainer width="100%" height={300}>
+							<LineChart
+								data={revenueLast7Day}
+								margin={{ top: 20, right: 20, left: 5, bottom: 5 }}
+							>
+								<CartesianGrid strokeDasharray="3 3" />
+								<XAxis dataKey="date" tick={{ fontSize: 12 }} />
+								<YAxis tick={{ fontSize: 12 }}></YAxis>
+								<Tooltip
+									formatter={(value, name) => [
+										`${value.toLocaleString()} VND`,
+										"Doanh thu",
+									]}
+									labelFormatter={(label) => `Ngày: ${label}`}
+								/>
+								<Legend
+									formatter={(value, entry, index) => {
+										return <span>{`Doanh thu`}</span>;
+									}}
+								/>
+								<Line
+									type="monotone"
+									dataKey="revenue"
+									stroke="#8884d8"
+									activeDot={{ r: 8 }}
+								/>
+							</LineChart>
+						</ResponsiveContainer>
+					</div>
 				</div>
 				<div
 					className="order-recent mt-4"
@@ -231,7 +288,7 @@ const Dashboard = () => {
 							<thead>
 								<tr>
 									<th scope="col">#</th>
-									<th scope="col">Khách hàng</th>
+									<th scope="col">Người dùng</th>
 									<th scope="col">Sản phẩm (Tên sản phẩm, Size, Số lượng)</th>
 									<th scope="col">Tổng tiền</th>
 									<th scope="col">Trạng thái</th>
@@ -242,7 +299,14 @@ const Dashboard = () => {
 								{orderRecent?.map((item, index) => (
 									<tr key={index}>
 										<th scope="row">#{item.id}</th>
-										<td>{item.fullname}</td>
+										<td>
+											<Link
+												to={`/admin/users/edit-user/${item.user.id}`}
+												className="text-dark"
+											>
+												{item.user.id}
+											</Link>
+										</td>
 										<td>
 											{item.order_Item.map((orderItem) => (
 												<div>
@@ -276,7 +340,7 @@ const Dashboard = () => {
 										</td>
 										<td>
 											<Link
-												to={`admin/order-detail/${item.id}`}
+												to={`/admin/order-detail/${item.id}`}
 												className="text-info"
 											>
 												Xem chi tiết

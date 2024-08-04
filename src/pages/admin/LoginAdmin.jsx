@@ -7,7 +7,7 @@ import * as UserService from "../../services/UserService";
 import { AppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 
-const SignIn = () => {
+const LoginAdmin = () => {
 	const [loginName, setLoginName] = useState("");
 	const [password, setPassword] = useState("");
 	const [errorLogin, setErrorLogin] = useState("");
@@ -15,7 +15,7 @@ const SignIn = () => {
 	const [showPasswordNew, setShowPasswordNew] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const navigate = useNavigate();
-	const { setUser, setTotalProductInCart } = useContext(AppContext);
+	const { setAdmin } = useContext(AppContext);
 	const [stage, setStage] = useState("SignIn");
 	const [loginForgot, setLoginForgot] = useState("");
 	const [resCode, setResCode] = useState("");
@@ -28,11 +28,10 @@ const SignIn = () => {
 		try {
 			const data = await UserService.login(loginName, password);
 			if (data) {
-				if (data.role === "user") {
-					sessionStorage.setItem("user", JSON.stringify(data));
-					setUser(data);
-					setTotalProductInCart(data.cart.length);
-					navigate("/home");
+				if (data.role === "admin") {
+					sessionStorage.setItem("admin", JSON.stringify(data));
+					setAdmin(data);
+					navigate("/admin/dashboard");
 				} else {
 					toast.error("Tài khoản hoặc mật khẩu không chính xác.");
 				}
@@ -52,7 +51,7 @@ const SignIn = () => {
 		e.preventDefault();
 		try {
 			console.log(loginForgot);
-			const data = await UserService.forgotPassword(loginForgot);
+			const data = await UserService.forgotPasswordAdmin(loginForgot);
 			setResCode(data);
 			setStage("OTP");
 			toast.success("Đã gửi mã OTP.");
@@ -80,7 +79,7 @@ const SignIn = () => {
 		}
 
 		try {
-			await UserService.ChangePassword(loginForgot, passwordNew);
+			await UserService.ChangePasswordAdmin(loginForgot, passwordNew);
 			toast.success("Thay đổi mật khẩu thành công.");
 			setStage("SignIn");
 		} catch (error) {
@@ -108,19 +107,19 @@ const SignIn = () => {
 					</div>
 					{stage === "SignIn" && (
 						<div className="col-6">
-							<div className="ps-2 mt-5">
-								<Link to="/home">
-									<img
-										src={logo}
-										alt="Logo"
-										style={{
-											width: "70px",
-											height: "auto",
-											marginBottom: "20px",
-										}}
-									/>
-									<span className="h1 fw-bold text-black-50">Shoes Shop</span>
-								</Link>
+							<div className="ps-2 mt-5 pt-4">
+								<img
+									src={logo}
+									alt="Logo"
+									style={{
+										width: "70px",
+										height: "auto",
+										marginBottom: "20px",
+									}}
+								/>
+								<span className="h1 fw-bold text-black-50">
+									Shoes Shop Admin
+								</span>
 							</div>
 							<div className="mx-4 pe-5">
 								<div className="sign-in">
@@ -173,21 +172,6 @@ const SignIn = () => {
 											</div>
 										</div>
 										<div className="d-flex justify-content-end align-items-center mb-2">
-											{/* <div className="form-check">
-											<input
-												className="form-check-input"
-												type="checkbox"
-												checked={rememberMe}
-												onChange={handleRememberMe}
-												id="form1Example3"
-											/>
-											<label
-												className="form-check-label"
-												htmlFor="form1Example3"
-											>
-												Nhớ tài khoản
-											</label>
-										</div> */}
 											<span
 												onClick={() => setStage("ForgotPassword")}
 												className="text-info"
@@ -206,20 +190,6 @@ const SignIn = () => {
 											</button>
 										</div>
 									</form>
-									<div className="d-flex justify-content-center align-items-center mb-3 pb-1">
-										<p>Hoặc đăng nhập với:</p>
-										<Link to="/#!" className="text-secondary">
-											<i className="bi bi-google mx-4"></i>
-										</Link>
-									</div>
-									<div>
-										<p className="mb-0">
-											Bạn chưa có tài khoản?{" "}
-											<Link to="/signup" className="text-info fw-bold">
-												Đăng Ký
-											</Link>
-										</p>
-									</div>
 								</div>
 							</div>
 						</div>
@@ -254,12 +224,6 @@ const SignIn = () => {
 								onClick={() => setStage("SignIn")}
 							>
 								Đăng nhập
-							</span>
-							<span> hoặc </span>
-							<span>
-								<Link to="/signup" className="text-info">
-									Đăng ký
-								</Link>
 							</span>
 						</div>
 					)}
@@ -376,4 +340,4 @@ const SignIn = () => {
 	);
 };
 
-export default SignIn;
+export default LoginAdmin;

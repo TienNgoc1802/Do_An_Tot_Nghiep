@@ -109,7 +109,7 @@ const Order = () => {
 				className="order-content"
 				style={{ padding: "15px 20px", flex: "1" }}
 			>
-				<h3 className="fw-bold mb-4">Đơn hàng</h3>
+				<h3 className="fw-bold mb-4">Quản Lý Đơn Hàng</h3>
 				<div>
 					<span
 						style={{
@@ -184,13 +184,13 @@ const Order = () => {
 							<thead>
 								<tr>
 									<th scope="col">#</th>
-									<th scope="col">Khách hàng</th>
+									<th scope="col">Tên người nhận</th>
 									<th scope="col">Số điện thoại</th>
 									<th scope="col">Ngày đặt</th>
 									<th scope="col">Trạng thái</th>
 									<th scope="col">Hình thức</th>
 									<th scope="col">Tổng tiền</th>
-									<th scope="col"></th>
+									<th scope="col">Thao tác</th>
 								</tr>
 							</thead>
 							<tbody>

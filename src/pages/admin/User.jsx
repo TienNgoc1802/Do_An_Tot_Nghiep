@@ -62,7 +62,7 @@ const User = () => {
 					className="user-content"
 					style={{ padding: "15px 20px", flex: "1" }}
 				>
-					<h3 className="fw-bold">Người dùng</h3>
+					<h3 className="fw-bold">Quản Lý Người Dùng</h3>
 					<button className="btn btn-info fw-bold mt-4">
 						<Link to="/admin/users/add-user" className="text-light">
 							Thêm người dùng
@@ -94,7 +94,7 @@ const User = () => {
 								<tbody>
 									{users?.map((item, index) => (
 										<tr key={index}>
-											<th scope="row">#{index + 1}</th>
+											<th scope="row">#{page * 10 + index + 1}</th>
 											<td>{item.id}</td>
 											<td>{item.user_Name}</td>
 											<td>{item.email}</td>

@@ -5,7 +5,7 @@ import { AppContext } from "../context/AppContext";
 
 const Header = () => {
 	const navigate = useNavigate();
-	const [inputSearch, setInputSearch] = useState("   ");
+	const [inputSearch, setInputSearch] = useState("");
 	const {
 		user,
 		setUser,
