@@ -232,7 +232,9 @@ const OrderDetail = () => {
 									<span>
 										{orderDetail.payment_Method === "Pay On Delivery"
 											? "Thanh toán khi nhận hàng"
-											: "Chuyển khoản qua ngân hàng"}
+											: orderDetail.payment_Method === "Pay On Bank"
+											? "Chuyển khoản qua ngân hàng"
+											: "Thanh toán qua VNPay"}
 									</span>
 								</div>
 							</div>

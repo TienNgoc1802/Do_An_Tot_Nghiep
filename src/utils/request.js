@@ -34,3 +34,8 @@ export const statisticalRequest = axios.create({
 	baseURL: "http://localhost:8090/api/v1/statistical",
 	timeout: 5000,
 });
+
+export const paymentRequest = axios.create({
+	baseURL: "http://localhost:8090/api/v1/payment",
+	timeout: 5000,
+});

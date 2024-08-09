@@ -18,3 +18,10 @@ export const getOrderByMonthAndYear = async (month, year) => {
 	});
 	return res.data;
 };
+
+export const getDailyRevenueByMonth = async (month, year) => {
+	const res = await statisticalRequest.get("/daily-revenue-by-month", {
+		params: { month, year },
+	});
+	return res.data;
+};

@@ -187,8 +187,8 @@ const Order = () => {
 									<th scope="col">Tên người nhận</th>
 									<th scope="col">Số điện thoại</th>
 									<th scope="col">Ngày đặt</th>
+									<th scope="col">Phương thức thanh toán</th>
 									<th scope="col">Trạng thái</th>
-									<th scope="col">Hình thức</th>
 									<th scope="col">Tổng tiền</th>
 									<th scope="col">Thao tác</th>
 								</tr>
@@ -203,7 +203,9 @@ const Order = () => {
 										<td>
 											{item.payment_Method === "Pay On Delivery"
 												? "Thanh toán khi nhận hàng"
-												: "Chuyển khoản qua ngân hàng"}
+												: item.payment_Method === "Pay On Bank"
+												? "Chuyển khoản qua ngân hàng"
+												: "Thanh toán qua VNPay"}
 										</td>
 										<td>
 											<span
@@ -220,7 +222,7 @@ const Order = () => {
 													? "Đang giao hàng"
 													: item.status === "Completed"
 													? "Đã giao hàng"
-													: "Đơn hàng bị hủy"}
+													: "Đã hủy"}
 											</span>
 										</td>
 										<td>{`${new Intl.NumberFormat("vi-VN").format(
@@ -228,7 +230,10 @@ const Order = () => {
 										)}₫`}</td>
 
 										<td>
-											<Link to={`/admin/order-detail/${item.id}`} className="text-info">
+											<Link
+												to={`/admin/order-detail/${item.id}`}
+												className="text-info"
+											>
 												Xem chi tiết
 											</Link>
 										</td>

@@ -6,8 +6,10 @@ import shipper from "../../assets/image/shipper.png";
 import COD from "../../assets/image/delivery.png";
 import tranfer from "../../assets/image/mobile-transfer.png";
 import success from "../../assets/image/success.png";
+import vnpay from "../../assets/image/vnpay.jpg";
 import * as cartService from "../../services/CartService";
 import * as orderService from "../../services/OrderService";
+import * as paymentService from "../../services/PaymentService";
 import toast from "react-hot-toast";
 
 const ModalSuccess = ({ isOpen }) => {
@@ -54,7 +56,7 @@ const ModalSuccess = ({ isOpen }) => {
 						style={{ padding: "20px", textAlign: "center" }}
 					>
 						<img src={success} alt="Success Icon"></img>
-						<h3 className="fw-bold my-3" style={{ color: "#FF6600"}}>
+						<h3 className="fw-bold my-3" style={{ color: "#FF6600" }}>
 							Đặt hàng thành công
 						</h3>
 						<p>
@@ -62,7 +64,9 @@ const ModalSuccess = ({ isOpen }) => {
 							để xác nhận đơn hàng trong thời gian sớm nhất.
 						</p>
 						<Link to="/home">
-							<button className="btn btn-info text-light mt-3 px-4 py-2 fw-bold">Về trang chủ</button>
+							<button className="btn btn-info text-light mt-3 px-4 py-2 fw-bold">
+								Về trang chủ
+							</button>
 						</Link>
 					</div>
 				</div>
@@ -72,7 +76,7 @@ const ModalSuccess = ({ isOpen }) => {
 };
 
 const CheckOut = () => {
-	const { user, totalProductInCart, setTotalProductInCart } =
+	const { user, totalProductInCart, setTotalProductInCart} =
 		useContext(AppContext);
 	const [provinces, setProvinces] = useState([]);
 	const [districts, setDistricts] = useState([]);
@@ -85,9 +89,9 @@ const CheckOut = () => {
 	const [listCart, setListCart] = useState([]);
 	const [message, setMessage] = useState(false);
 	const [total, setTotal] = useState(0);
-	const [fullName, setFullName] = useState("");
+	const [fullName, setFullName] = useState(user.user_Name);
 	const [address, setAddress] = useState("");
-	const [phone, setPhone] = useState("");
+	const [phone, setPhone] = useState(user.phone_Number);
 	const [transportFee, setTransportFee] = useState(30000);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -214,22 +218,45 @@ const CheckOut = () => {
 		let finalAddress = `${address}, ${getSelectedWardName()}, ${getSelectedDistrictName()}, ${getSelectedProvinceName()}`;
 		let finalTotal = total + transportFee;
 
-		try {
-			const data = await orderService.placeOrder(
-				user.id,
+		if (selectedPaymentMethod == "Pay On VNPay") {
+			let userId = user.id;
+			const order = {
+				userId,
 				fullName,
 				phone,
 				finalAddress,
 				selectedPaymentMethod,
-				finalTotal
-			);
-			if (data) {
-				toast.success("Đã thanh toán thành công.");
-				setTotalProductInCart(0);
-				setIsModalOpen(true);
+				finalTotal,
+			};
+			localStorage.setItem('order', JSON.stringify(order));
+			try {
+				const data = await paymentService.creatPaymentURL(finalTotal);
+				if (data) {
+					window.location.href = data;
+				}
+			} catch (error) {
+				toast.error("Đã xảy ra lỗi khi thanh toán.");
+				console.error("Error creating payment URL:", error);
 			}
-		} catch (error) {
-			console.log("Check out fail: ", error);
+		} else {
+			try {
+				const data = await orderService.placeOrder(
+					user.id,
+					fullName,
+					phone,
+					finalAddress,
+					selectedPaymentMethod,
+					finalTotal
+				);
+				if (data) {
+					toast.success("Đã thanh toán thành công.");
+					setTotalProductInCart(0);
+					setIsModalOpen(true);
+				}
+			} catch (error) {
+				toast.error("Đã xảy ra lỗi khi thanh toán.");
+				console.log("Check out fail: ", error);
+			}
 		}
 	};
 
@@ -467,16 +494,43 @@ const CheckOut = () => {
 														<div
 															style={{ textAlign: "center", padding: "20px" }}
 														>
-															Quí khách chuyển khoản qua ngân hàng với nội dung:{" "}
+															Quí khách chuyển khoản qua ngân hàng với nội dung:
 															<br />
-															Số điện thoại + Họ Tên <br />
+															Số điện thoại + Họ Tên
+															<br />
 															<br />
 															Ngân hàng TPBank <br />
 															Số tài khoản: 0000 1762 871 <br />
 															Chủ tài khoản: Nguyễn Tiến Ngọc
+															<br />
+															<br />
+															Shoes Shop liện lạc xác nhận đơn hàng của bạn.
 														</div>
 													</>
 												)}
+											</div>
+											<div
+												className=" mt-2"
+												style={{
+													border: "1px solid darkgrey",
+													borderRadius: "3px",
+												}}
+											>
+												<div className="d-flex justify-content-start align-items-center p-2">
+													<input
+														type="radio"
+														id="Pay On VNPay"
+														className="mx-3"
+														checked={selectedPaymentMethod === "Pay On VNPay"}
+														onChange={handlePaymentMethodChange}
+													/>
+													<img
+														src={vnpay}
+														alt="VnPay Icon"
+														style={{ width: "32px" }}
+													></img>
+													<span className="ms-3">Thanh toán qua VNPay</span>
+												</div>
 											</div>
 											<div className="d-flex justify-content-between align-items-center mt-4">
 												<Link to="/cart">

@@ -40,6 +40,9 @@ import AddProduct from "./pages/admin/AddProduct";
 import EditProduct from "./pages/admin/EditProduct";
 import LoginAdmin from "./pages/admin/LoginAdmin";
 import Profile from "./pages/admin/Profile";
+import Contact from "./pages/user/Contact";
+import About from "./pages/user/About";
+import VNPayResponsive from "./pages/user/VNPayResponsive";
 
 const App = () => {
 	return (
@@ -60,9 +63,11 @@ const AppContent = () => {
 		location.pathname === "/signup" ||
 		location.pathname === "/checkout";
 	const isAdminPage = location.pathname.startsWith("/admin");
+	const isVNPayResponsive = location.pathname.startsWith("/return-payment");
 	const navigate = useNavigate();
 
 	useEffect(() => {
+		{window.scrollTo(0, 0)}
 		const storedAdmin = sessionStorage.getItem("admin");
 		if (storedAdmin) {
 			const adminData = JSON.parse(storedAdmin);
@@ -76,8 +81,7 @@ const AppContent = () => {
 
 	return (
 		<>
-			{window.scrollTo(0, 0)}
-			{!isSignInPage && !isAdminPage && <Header currentPage="home" />}
+			{!isSignInPage && !isAdminPage && !isVNPayResponsive && <Header currentPage="home" />}
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/home" element={<Home />} />
@@ -96,6 +100,9 @@ const AppContent = () => {
 				<Route path="/search" element={<Search />} />
 				<Route path="/checkout" element={<CheckOut />} />
 				<Route path="/account" element={<Account />} />
+				<Route path="/contact" element={<Contact />} />
+				<Route path="/about" element={<About/>} />
+				<Route path="/return-payment" element={<VNPayResponsive />} />
 				<Route path="/admin/login" element={<LoginAdmin />} />
 				<Route path="/admin">
 					<Route path="dashboard" element={<Dashboard />} />
@@ -119,7 +126,7 @@ const AppContent = () => {
 					<Route path="profile" element={<Profile />} />
 				</Route>
 			</Routes>
-			{!isSignInPage && !isAdminPage && <Footer />}
+			{!isSignInPage && !isAdminPage && !isVNPayResponsive && <Footer />}
 		</>
 	);
 };

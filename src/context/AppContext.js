@@ -9,6 +9,7 @@ export const AppProvider = ({ children }) => {
 	const [admin, setAdmin] = useState(null);
 	const [selectedProducts, setSelectedProducts] = useState([]);
 	const [searchContent, setSearchContent] = useState("");
+	const [order, setOrder] = useState(null);
 
 	const fetchListCart = async (id) => {
 		try {
@@ -26,7 +27,6 @@ export const AppProvider = ({ children }) => {
 			setUser(userData);
 			fetchListCart(userData.id);
 		}
-
 	}, [setUser, setTotalProductInCart]);
 
 	return (
@@ -40,7 +40,8 @@ export const AppProvider = ({ children }) => {
 				setSearchContent,
 				admin,
 				setAdmin,
-				selectedProducts, setSelectedProducts
+				selectedProducts,
+				setSelectedProducts,
 			}}
 		>
 			{children}

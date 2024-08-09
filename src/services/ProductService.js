@@ -104,16 +104,26 @@ export const addProduct = async (
 	formData.append("product_category", categoryID);
 	formData.append("product_is_active", isActive);
 
-	const imagePromises = images.map(async (image, index) => {
+	// const imagePromises = images.map(async (image, index) => {
+	// 	if (image) {
+	// 		const response = await fetch(image);
+	// 		const blob = await response.blob();
+	// 		const compressedBlob = await compressImage(blob);
+	// 		formData.append(`product_images`, compressedBlob, `${index}.jpg`);
+	// 	}
+	// });
+
+	// await Promise.all(imagePromises);
+
+	for (let index = 0; index < images.length; index++) {
+		const image = images[index];
 		if (image) {
 			const response = await fetch(image);
 			const blob = await response.blob();
 			const compressedBlob = await compressImage(blob);
 			formData.append(`product_images`, compressedBlob, `${index}.jpg`);
 		}
-	});
-
-	await Promise.all(imagePromises);
+	}
 
 	formData.append("product_sizes", JSON.stringify(sizes));
 
@@ -149,16 +159,26 @@ export const editProduct = async (
 	formData.append("product_category", categoryID);
 	formData.append('product_is_active', isActive || '0');
 
-	const imagePromises = images.map(async (image, index) => {
+	// const imagePromises = images.map(async (image, index) => {
+	// 	if (image) {
+	// 		const response = await fetch(image);
+	// 		const blob = await response.blob();
+	// 		const compressedBlob = await compressImage(blob);
+	// 		formData.append(`product_images`, compressedBlob, `${index}.jpg`);
+	// 	}
+	// });
+
+	// await Promise.all(imagePromises);
+
+	for (let index = 0; index < images.length; index++) {
+		const image = images[index];
 		if (image) {
 			const response = await fetch(image);
 			const blob = await response.blob();
 			const compressedBlob = await compressImage(blob);
 			formData.append(`product_images`, compressedBlob, `${index}.jpg`);
 		}
-	});
-
-	await Promise.all(imagePromises);
+	}
 
 	formData.append("product_sizes", JSON.stringify(sizes));
 
