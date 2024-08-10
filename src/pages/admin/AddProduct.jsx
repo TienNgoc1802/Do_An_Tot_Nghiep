@@ -245,6 +245,7 @@ const AddProduct = () => {
 							<div className="d-flex align-items-center mt-2">
 								<div className="me-1">
 									<div className="me-2 d-flex flex-column">
+									<label className="fw-bold">Size:</label>
 										<input
 											style={{
 												marginTop: "5px",
@@ -259,6 +260,7 @@ const AddProduct = () => {
 											value={size}
 											onChange={(e) => setSize(e.target.value)}
 										/>
+										<label className="fw-bold">Số lượng:</label>
 										<input
 											style={{
 												marginTop: "5px",

@@ -7,22 +7,51 @@ import toast from "react-hot-toast";
 const ModalAddToCart = ({ isOpen, onClose, product, setIsModalOpen }) => {
 	const [quantity, setQuantity] = useState(1);
 	const [size, setSize] = useState(null);
+	const [countSize, setCountSize] = useState(0);
 	const { user, setTotalProductInCart } = useContext(AppContext);
 
 	useEffect(() => {
 		setQuantity(1);
 		if (product.productSize && product.productSize.length > 0) {
 			setSize(product.productSize[0].size);
+			setCountSize(product.productSize[0].quantity);
 		}
 	}, [product]);
 
 	const increaseQuantity = () => {
-		setQuantity(quantity + 1);
+		if (quantity < countSize) {
+			setQuantity(quantity + 1);
+		}
+		else{
+			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+		}
 	};
 
 	const decreaseQuantity = () => {
 		if (quantity > 1) {
 			setQuantity(quantity - 1);
+		}
+		else{
+			toast.error(`Bạn phải đặt hàng tối thiểu 1 sản phẩm.`);
+		}
+	};
+
+	const handleQuantityInputChange = (event) => {
+		const value = event.target.value;
+		const intValue = parseInt(value, 10);
+		// if (!isNaN(intValue) && intValue > 0) {
+		// 	setQuantity(intValue);
+		// } else if (value === "") {
+		// 	setQuantity("");
+		// }
+
+		if (value === "") {
+			setQuantity("");
+		} else if (!isNaN(intValue) && intValue > 0 && intValue <= countSize) {
+			setQuantity(intValue);
+		} else if (intValue > countSize) {
+			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+			setQuantity(countSize);
 		}
 	};
 
@@ -31,6 +60,16 @@ const ModalAddToCart = ({ isOpen, onClose, product, setIsModalOpen }) => {
 			toast.error(
 				"Bạn cần phải đăng nhập trước khi thực hiện thêm sản phẩm vào giỏ hàng."
 			);
+			return;
+		}
+
+		
+		if(quantity > countSize){
+			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+			return;
+		}
+		if(quantity > countSize){
+			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
 			return;
 		}
 
@@ -86,7 +125,7 @@ const ModalAddToCart = ({ isOpen, onClose, product, setIsModalOpen }) => {
 			style={{ display: "block" }}
 			tabIndex="-1"
 			role="dialog"
-			aria-hidden="true"
+			aria-hidden="false"
 		>
 			<div
 				className="modal-add-to-cart modal-dialog modal-dialog-centered"
@@ -98,12 +137,27 @@ const ModalAddToCart = ({ isOpen, onClose, product, setIsModalOpen }) => {
 				>
 					<div className="modal-body">
 						<h3 className="fw-bold">Chọn kích thước & số lượng</h3>
+						<p>
+							<strong>Còn lại: {countSize} sản phẩm</strong>
+						</p>
 						<div className="d-flex justify-content-center align-items-center">
 							<div className="media-size">
 								<select
 									className="size-selector me-4 p-2 fw-bold"
 									value={size}
-									onChange={(event) => setSize(event.target.value)}
+									onChange={(e) => {
+										const selectedSize = e.target.value;
+										setSize(selectedSize);
+
+										const foundSize = product.productSize.find(
+											(item) => item.size.toString() === selectedSize
+										);
+
+										if (foundSize) {
+											console.log("Setting countSize to:", foundSize.quantity);
+											setCountSize(foundSize.quantity);
+										}
+									}}
 								>
 									{product.productSize.map((size, index) => (
 										<option key={index} value={size.size}>
@@ -129,8 +183,8 @@ const ModalAddToCart = ({ isOpen, onClose, product, setIsModalOpen }) => {
 									name="quantity"
 									value={quantity}
 									min="1"
+									onChange={handleQuantityInputChange}
 									className="quantity-input"
-									readOnly
 								></input>
 								<button
 									type="button"

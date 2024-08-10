@@ -16,11 +16,22 @@ const ProductDetail = () => {
 	const [product, setProduct] = useState(null);
 	const { user, setTotalProductInCart } = useContext(AppContext);
 	const [size, setSize] = useState(null);
+	const [countSize, setCountSize] = useState(0);
+
+	const soLuong = (size) => {
+		product.productSize.forEach((item) => {
+			if (item.size === size) {
+				setCountSize(item.quantity);
+			}
+		});
+	};
 
 	const handleItemClick = (index) => {
 		setFocusedIndex(index);
 		console.log(size);
-		setSize(product.productSize[index].size);
+		const newSize = product.productSize[index].size;
+		setSize(newSize);
+		soLuong(newSize);
 		setTimeout(() => {
 			console.log("Item clicked:", product.productSize[index].size, index);
 		}, 0);
@@ -31,22 +42,39 @@ const ProductDetail = () => {
 	};
 
 	const increaseQuantity = () => {
-		setQuantity(quantity + 1);
+		if (quantity < countSize) {
+			setQuantity(quantity + 1);
+		}
+		else{
+			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+		}
 	};
 
 	const decreaseQuantity = () => {
 		if (quantity > 1) {
 			setQuantity(quantity - 1);
 		}
+		else{
+			toast.error(`Bạn phải đặt hàng tối thiểu 1 sản phẩm.`);
+		}
 	};
 
 	const handleQuantityInputChange = (event) => {
 		const value = event.target.value;
 		const intValue = parseInt(value, 10);
-		if (!isNaN(intValue) && intValue > 0) {
-			setQuantity(intValue);
-		} else if (value === "") {
+		// if (!isNaN(intValue) && intValue > 0) {
+		// 	setQuantity(intValue);
+		// } else if (value === "") {
+		// 	setQuantity("");
+		// }
+
+		if (value === "") {
 			setQuantity("");
+		} else if (!isNaN(intValue) && intValue > 0 && intValue <= countSize) {
+			setQuantity(intValue);
+		} else if (intValue > countSize) {
+			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+			setQuantity(countSize);
 		}
 	};
 
@@ -56,6 +84,7 @@ const ProductDetail = () => {
 				const data = await productService.getProductById(product_id);
 				setProduct(data);
 				setSize(data.productSize[focusedIndex].size);
+				setCountSize(data.productSize[focusedIndex].quantity);
 			} catch (error) {
 				console.log(error);
 			}
@@ -65,8 +94,15 @@ const ProductDetail = () => {
 	}, []);
 
 	const handleAddToCart = async () => {
-		if(!user){
-			toast.error("Bạn cần phải đăng nhập trước khi thực hiện thêm sản phẩm vào giỏ hàng.");
+		if (!user) {
+			toast.error(
+				"Bạn cần phải đăng nhập trước khi thực hiện thêm sản phẩm vào giỏ hàng."
+			);
+			return;
+		}
+
+		if(quantity > countSize){
+			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
 			return;
 		}
 
@@ -149,6 +185,9 @@ const ProductDetail = () => {
 												{product.is_Active === 1 ? `Còn hàng` : `Hết hàng`}
 											</strong>
 										</div>
+										<span>
+											Đã bán: <strong>{product.sold}</strong>
+										</span>
 									</div>
 									<div className="d-flex flex-wrap">
 										<div
@@ -298,6 +337,9 @@ const ProductDetail = () => {
 												>
 													<i className="bi bi-plus fs-4"></i>
 												</button>
+												<span className="ms-4">
+													<strong>Còn lại: {countSize} sản phẩm</strong>
+												</span>
 											</div>
 											{product.is_Active === 1 ? (
 												<div

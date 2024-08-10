@@ -269,6 +269,9 @@ const Cart = () => {
 																</div>
 																<div className="d-flex justify-content-end align-items-center">
 																	<div className="media-size">
+																		<p>
+																			<strong>Size:</strong>
+																		</p>
 																		<select
 																			className="size-selector me-5 p-2 fw-bold"
 																			value={item.size}

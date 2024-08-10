@@ -283,6 +283,7 @@ const EditProduct = () => {
 							<div className="d-flex align-items-center mt-2">
 								<div className="me-1">
 									<div className="me-2 d-flex flex-column">
+										<label className="fw-bold">Size:</label>
 										<input
 											style={{
 												marginTop: "5px",
@@ -297,6 +298,7 @@ const EditProduct = () => {
 											value={size}
 											onChange={(e) => setSize(e.target.value)}
 										/>
+										<label className="fw-bold">Số lượng:</label>
 										<input
 											style={{
 												marginTop: "5px",
@@ -330,6 +332,7 @@ const EditProduct = () => {
 											key={index}
 											className="image-item me-3 d-flex flex-column"
 										>
+											<label className="fw-bold">Size:</label>
 											<input
 												style={{
 													marginTop: "5px",
@@ -344,6 +347,7 @@ const EditProduct = () => {
 												value={item.size}
 												onChange={(e) => handleSizeChange(index, e)}
 											/>
+											<label className="fw-bold">Số lượng:</label>
 											<input
 												style={{
 													marginTop: "5px",
