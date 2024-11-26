@@ -110,7 +110,125 @@ const Order = () => {
 				style={{ padding: "15px 20px", flex: "1" }}
 			>
 				<h3 className="fw-bold mb-4">Quản Lý Đơn Hàng</h3>
-				<div>
+				<form>
+					<div className="row">
+						<div className="col-4">
+							<label className="form-label fw-bold">Mã đơn hàng</label>
+							<input
+								name=""
+								type="text"
+								className="form-control"
+								// value={name}
+								// onChange={(e) => setName(e.target.value)}
+							/>
+						</div>
+						<div className="col-4">
+							<label className="form-label fw-bold">Ngày đặt</label>
+							<input
+								name="order-date"
+								type="date"
+								className="form-control"
+								// value={startDate}
+								// onChange={(e) => setStartDate(e.target.value)}
+							/>
+						</div>
+						<div className="col-4">
+							<label className="form-label fw-bold">Số điện thoại</label>
+							<input
+								name="phont"
+								type="text"
+								className="form-control"
+								placeholder="Nhập số điện thoại"
+								// value={startDate}
+								// onChange={(e) => setStartDate(e.target.value)}
+							/>
+						</div>
+						<div className="col-4 mt-3">
+							<label className="form-label fw-bold">
+								Phương thức thanh toán
+							</label>
+							<select
+								className="form-select"
+								// onChange={(e) => setRole(e.target.value)}
+							>
+								<option value="">Chọn phương thức thanh toán</option>
+								<option value="admin">Thanh toán khi nhận hàng</option>
+								<option value="user">Thanh toán qua VNPay</option>
+							</select>
+						</div>
+						<div className="col-4 mt-3">
+							<label className="form-label fw-bold">Trạng thái đơn hàng</label>
+							<ul className="checkbox-list-status-order">
+								<li>
+									<input
+										type="radio"
+										className="checkbox-item"
+										// name="priceRange"
+										// value="under-1000000"
+										// checked={selectedPriceRange === "under-1000000"}
+										// onChange={(e) => setSelectedPriceRange(e.target.value)}
+									/>
+									<label>Chờ xác nhận</label>
+								</li>
+								<li>
+									<input
+										type="radio"
+										className="checkbox-item"
+										// name="priceRange"
+										// value="under-1000000"
+										// checked={selectedPriceRange === "under-1000000"}
+										// onChange={(e) => setSelectedPriceRange(e.target.value)}
+									/>
+									<label>Đang giao</label>
+								</li>
+								<li>
+									<input
+										type="radio"
+										className="checkbox-item"
+										// name="priceRange"
+										// value="under-1000000"
+										// checked={selectedPriceRange === "under-1000000"}
+										// onChange={(e) => setSelectedPriceRange(e.target.value)}
+									/>
+									<label>Đã giao</label>
+								</li>
+								<li>
+									<input
+										type="radio"
+										className="checkbox-item"
+										// name="priceRange"
+										// value="under-1000000"
+										// checked={selectedPriceRange === "under-1000000"}
+										// onChange={(e) => setSelectedPriceRange(e.target.value)}
+									/>
+									<label>Đã hủy</label>
+								</li>
+							</ul>
+						</div>
+						<div className="col-4 mt-3">
+							<button type="submit" className="btn btn-success">
+								<i className="bi bi-search pe-2"></i>
+								<span className="fw-bold">Tìm kiếm</span>
+							</button>
+							<button type="button" className="btn btn-success ms-3">
+								<i className="bi bi-arrow-clockwise me-2"></i>
+								<span className="fw-bold">Xóa bộ lọc</span>
+							</button>
+							<div className="d-flex align-items-center mt-3">
+								<i className="bi bi-printer-fill fs-4 me-2 text-success"></i>	
+								<button type="button" className="btn btn-success">
+									<i className="bi bi-cloud-arrow-down-fill me-2"></i>
+									<span className="fw-bold">Xuất báo cáo</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div className="d-flex mt-4">
+					<p style={{flex: 1, fontWeight: "bold"}}>Tổng đơn: 2</p>
+					<p style={{flex: 1, fontWeight: "bold"}}>Tổng gía trị đơn: 2</p>
+				</div>
+				{/* <div>
 					<span
 						style={{
 							cursor: "pointer",
@@ -169,7 +287,7 @@ const Order = () => {
 					>
 						Đã hủy({canceledOrder})
 					</span>
-				</div>
+				</div> */}
 				<div
 					className="mt-4"
 					style={{

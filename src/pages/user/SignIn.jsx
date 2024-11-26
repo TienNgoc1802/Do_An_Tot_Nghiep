@@ -206,12 +206,12 @@ const SignIn = () => {
 											</button>
 										</div>
 									</form>
-									<div className="d-flex justify-content-center align-items-center mb-3 pb-1">
+									{/* <div className="d-flex justify-content-center align-items-center mb-3 pb-1">
 										<p>Hoặc đăng nhập với:</p>
 										<Link to="/#!" className="text-secondary">
 											<i className="bi bi-google mx-4"></i>
 										</Link>
-									</div>
+									</div> */}
 									<div>
 										<p className="mb-0">
 											Bạn chưa có tài khoản?{" "}

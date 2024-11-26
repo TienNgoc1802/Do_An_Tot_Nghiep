@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import * as productService from "../../services/ProductService";
 import * as categoryServie from "../../services/CategoryService";
+import { Editor } from "@tinymce/tinymce-react";
 
 const AddProduct = () => {
 	const [name, setName] = useState("");
@@ -14,8 +15,8 @@ const AddProduct = () => {
 	const [categories, setCategories] = useState([]);
 	const [sizes, setSizes] = useState([]);
 	const [images, setImages] = useState([]);
-	const [size, setSize] = useState("");
-	const [quantity, setQuantity] = useState(50);
+	const [size, setSize] = useState(35);
+	const [quantity, setQuantity] = useState(1);
 	const navigate = useNavigate();
 
 	const handleImageUpload = (event) => {
@@ -29,10 +30,27 @@ const AddProduct = () => {
 	};
 
 	const handleAddSize = () => {
-		if (size && quantity) {
-			setSizes([...sizes, { size, quantity }]);
-			setSize("");
-			setQuantity(50);
+		// Kiểm tra nếu size và quantity hợp lệ
+		if (size && quantity && !isNaN(quantity) && quantity > 0) {
+			// Tìm xem size đã tồn tại trong mảng sizes chưa
+			const existingIndex = sizes.findIndex((item) => item.size === size);
+
+			if (existingIndex !== -1) {
+				// Nếu size đã tồn tại, cộng thêm số lượng vào mục đã tồn tại
+				const updatedSizes = [...sizes];
+				updatedSizes[existingIndex].quantity += parseInt(quantity);
+				setSizes(updatedSizes);
+			} else {
+				// Nếu size chưa tồn tại, thêm mới vào mảng
+				setSizes([...sizes, { size, quantity: parseInt(quantity) }]);
+			}
+
+			// Reset lại giá trị size và quantity sau khi thêm
+			setSize(35);
+			setQuantity(1);
+		} else {
+			// Thông báo nếu thiếu thông tin hoặc quantity không hợp lệ
+			toast.error("Vui lòng nhập đầy đủ và đúng thông tin.");
 		}
 	};
 
@@ -119,7 +137,7 @@ const AddProduct = () => {
 									onChange={(e) => setName(e.target.value)}
 								/>
 							</div>
-							<div className="col-12 col-lg-12 mt-3">
+							{/* <div className="col-12 col-lg-12 mt-3">
 								<label className="form-label fw-bold">Mô tả sản phẩm</label>
 								<textarea
 									name="description"
@@ -128,6 +146,64 @@ const AddProduct = () => {
 									placeholder="Mô tả"
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
+								/>
+							</div> */}
+							<div className="col-12 col-lg-12 mt-3">
+								<label className="form-label fw-bold">Mô tả sản phẩm</label>
+								<Editor
+									apiKey="mox6ndutu0gm9qjelpselp2x2phs7f6m9f8zgaflywh6vdp9" // Thay bằng API key của bạn
+									value={description}
+									init={{
+										height: 500,
+										menubar: false,
+										plugins: [
+											"advlist",
+											"autolink",
+											"lists",
+											"link",
+											"image",
+											"charmap",
+											"preview",
+											"anchor",
+											"searchreplace",
+											"visualblocks",
+											"code",
+											"fullscreen",
+											"insertdatetime",
+											"media",
+											"table",
+											"code",
+											"help",
+											"wordcount",
+										],
+										toolbar: [
+											"undo redo | formatselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | \
+											bullist numlist outdent indent | blockquote | link image media codesample | \
+											forecolor backcolor | emoticons | removeformat | code | table | template | nonbreaking | fontsize | fullscreen",
+										].join(" "),
+										// Cấu hình toolbar cho các chức năng cần thiết, bao gồm font size
+										content_style:
+											"body { font-family: Arial, sans-serif; font-size: 14px; }",
+										font_size_formats: "8px 10px 12px 14px 16px 18px 24px 36px", // Các kích thước font có sẵn
+										file_picker_callback: function (callback, value, meta) {
+											// Thêm chức năng tải lên hình ảnh từ máy tính hoặc URL
+											if (meta.filetype === "image") {
+												var input = document.createElement("input");
+												input.setAttribute("type", "file");
+												input.setAttribute("accept", "image/*");
+												input.onchange = function () {
+													var file = input.files[0];
+													var reader = new FileReader();
+													reader.onload = function () {
+														callback(reader.result, { alt: file.name });
+													};
+													reader.readAsDataURL(file);
+												};
+												input.click();
+											}
+										},
+									}}
+									onEditorChange={(content) => setDescription(content)}
 								/>
 							</div>
 							<div className="col-4 col-lg-4 mt-3">
@@ -190,12 +266,12 @@ const AddProduct = () => {
 							<div className="d-flex align-items-center mt-2">
 								<label htmlFor="add-image">
 									<i
-										className="bi bi-plus-lg"
+										className="bi bi-camera-fill"
 										style={{
-											fontSize: "20px",
-											border: "1px solid black",
-											padding: "5px 10px",
-											borderRadius: "3px",
+											fontSize: "25px",
+											padding: "3px 15px",
+											background: "#EEEEEE",
+											borderRadius: "5px",
 											cursor: "pointer",
 										}}
 									></i>
@@ -218,22 +294,23 @@ const AddProduct = () => {
 												alt={`Uploaded ${index}`}
 												style={{ width: "120px", height: "130px" }}
 											/>
-											<button
-												className="btn"
-												type="button"
-												onClick={() => handleRemoveImage(index)}
-											>
-												<i
-													className="bi bi-dash-lg"
+											<div className="d-flex justify-content-center pt-2">
+												<button
+													className="btn"
+													type="button"
 													style={{
-														fontSize: "15px",
-														border: "1px solid black",
-														padding: "0 5px",
-														borderRadius: "3px",
-														cursor: "pointer",
+														background: "#EEEEEE",
+														borderRadius: "50%",
+														fontSize: "12px",
+														width: "40px",
+														height: "40px",
+														padding: "0",
 													}}
-												></i>
-											</button>
+													onClick={() => handleRemoveImage(index)}
+												>
+													Xóa
+												</button>
+											</div>
 										</div>
 									))}
 								</div>
@@ -242,10 +319,87 @@ const AddProduct = () => {
 
 						<div className="add-size mt-3">
 							<p className="fw-bold">Kích thước sản phẩm(Size, Số lượng)</p>
-							<div className="d-flex align-items-center mt-2">
+							<div className="mt-2">
+								<table
+									className="table table-bordered table-striped"
+									style={{ width: "450px" }}
+								>
+									<thead>
+										<tr>
+											<th scope="col">#</th>
+											<th scope="col">Size</th>
+											<th scope="col">Số lượng nhập</th>
+											<th scope="col">Thao tác</th>
+										</tr>
+									</thead>
+									<tbody>
+										{sizes.map((item, index) => (
+											<tr key={index}>
+												<th scope="row">{index + 1}</th>
+												<td>{item.size}</td>
+												<td>{item.quantity}</td>
+												<td>
+													<div className="d-flex justify-content-center">
+														<button
+															type="button"
+															className="btn btn-danger"
+															onClick={() => handleRemoveSize(index)}
+														>
+															Xóa
+														</button>
+													</div>
+												</td>
+											</tr>
+										))}
+										<tr>
+											<th scope="row" style={{ width: "50px" }}>
+												@
+											</th>
+											<td style={{ width: "100px" }}>
+												<select
+													className="form-select"
+													onChange={(e) => setSize(Number(e.target.value))}
+													value={size}
+												>
+													{Array.from(
+														{ length: 11 },
+														(_, i) => 35 + i
+													).map((sizeOption) => (
+														<option key={sizeOption} value={sizeOption}>
+															{Number.isInteger(sizeOption)
+																? sizeOption
+																: sizeOption.toFixed(1)}
+														</option>
+													))}
+												</select>
+											</td>
+											<td style={{ width: "150px" }}>
+												<input
+													className="form-control"
+													type="number"
+													value={quantity}
+													onChange={(e) => setQuantity(e.target.value)}
+												/>
+											</td>
+											<td style={{ width: "70px" }}>
+												<div className="d-flex justify-content-center">
+													<button
+														type="button"
+														className="btn btn-primary"
+														onClick={handleAddSize}
+													>
+														Thêm
+													</button>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							{/* <div className="d-flex align-items-center mt-2">
 								<div className="me-1">
 									<div className="me-2 d-flex flex-column">
-									<label className="fw-bold">Size:</label>
+										<label className="fw-bold">Size:</label>
 										<input
 											style={{
 												marginTop: "5px",
@@ -322,7 +476,7 @@ const AddProduct = () => {
 										</div>
 									))}
 								</div>
-							</div>
+							</div>*/}
 						</div>
 
 						<button

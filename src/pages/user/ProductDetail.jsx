@@ -17,6 +17,62 @@ const ProductDetail = () => {
 	const { user, setTotalProductInCart } = useContext(AppContext);
 	const [size, setSize] = useState(null);
 	const [countSize, setCountSize] = useState(0);
+	const [imageReview, setImageReview] = useState(null);
+	const [review, setReview] = useState(null);
+	const [rating, setRating] = useState(0);
+	const [listRating, setListRating] = useState([]);
+
+	const handleSubmitRating = (e) => {
+		e.preventDefault();
+		const newRating = {
+			review: review,
+			rating: rating,
+			imageReview: imageReview,
+		};
+
+		setListRating((prevList) => [...prevList, newRating]);
+
+		setRating(null); // Reset sao
+		setReview(""); // Reset review
+		setImageReview(null); // Reset ảnh
+	};
+
+	const calculateAverageRating = () => {
+		if (listRating.length === 0) return 0; // Tránh chia cho 0
+
+		const totalRating = listRating.reduce((acc, curr) => acc + curr.rating, 0);
+		return totalRating / listRating.length;
+	};
+
+	const averageRating = calculateAverageRating().toFixed(1);
+
+	const countRatings = () => {
+		return listRating.reduce((acc, curr) => {
+			if (acc[curr.rating]) {
+				acc[curr.rating]++;
+			} else {
+				acc[curr.rating] = 1;
+			}
+			return acc;
+		}, {});
+	};
+
+	const ratingCounts = countRatings();
+
+	const handleRatingChange = (e) => {
+		setRating(Number(e.target.value));
+	};
+
+	const handleImageUpload = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				setImageReview(reader.result);
+			};
+			reader.readAsDataURL(file);
+		}
+	};
 
 	const soLuong = (size) => {
 		product.productSize.forEach((item) => {
@@ -44,18 +100,16 @@ const ProductDetail = () => {
 	const increaseQuantity = () => {
 		if (quantity < countSize) {
 			setQuantity(quantity + 1);
-		}
-		else{
-			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+		} else {
+			toast.error(`Số lượng đặt hàng tối đa là ${countSize} sản phẩm.`);
 		}
 	};
 
 	const decreaseQuantity = () => {
 		if (quantity > 1) {
 			setQuantity(quantity - 1);
-		}
-		else{
-			toast.error(`Bạn phải đặt hàng tối thiểu 1 sản phẩm.`);
+		} else {
+			toast.error(`Số lượng đặt hàng tối thiểu là 1 sản phẩm.`);
 		}
 	};
 
@@ -73,7 +127,7 @@ const ProductDetail = () => {
 		} else if (!isNaN(intValue) && intValue > 0 && intValue <= countSize) {
 			setQuantity(intValue);
 		} else if (intValue > countSize) {
-			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+			toast.error(`Số lượng đặt hàng tối đa là ${countSize} sản phẩm.`);
 			setQuantity(countSize);
 		}
 	};
@@ -101,8 +155,8 @@ const ProductDetail = () => {
 			return;
 		}
 
-		if(quantity > countSize){
-			toast.error(`Bạn chỉ có thể đặt hàng tối đa ${countSize} sản phẩm.`);
+		if (quantity > countSize) {
+			toast.error(`Số lượng đặt hàng tối đa là ${countSize} sản phẩm.`);
 			return;
 		}
 
@@ -169,14 +223,15 @@ const ProductDetail = () => {
 									style={{
 										padding: "12px",
 										marginLeft: "12px",
+										marginRight: "12px",
 										background: "#fff",
-										width: "850.17px",
+										width: "838.17px",
 										height: "569px",
 									}}
 								>
 									<div
 										className="product-heading"
-										style={{ paddingBottom: "20px" }}
+										style={{ paddingLeft: "12px" }}
 									>
 										<h2 className="fw-bold pb-2">{product.product_Name}</h2>
 										<div className="sold-old">
@@ -194,12 +249,6 @@ const ProductDetail = () => {
 											className="col-lg-8 wrapbox-left"
 											style={{ paddingRight: "12px" }}
 										>
-											<div className="tilte-description">
-												<span>
-													<strong>Mô tả sản phẩm: </strong>
-													{product.description}
-												</span>
-											</div>
 											<div
 												className="price-title d-flex justify-content-start align-items-center"
 												style={{
@@ -409,18 +458,81 @@ const ProductDetail = () => {
 													</div>
 												</div>
 											</div>
-											<div className="product-banner">
-												<Link to="/collections/all">
-													<img
-														src={banner}
-														alt="Product Banner"
-														style={{
-															width: "263.83px",
-															height: "132px",
-															padding: "12px 0",
-														}}
-													/>
-												</Link>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div className="coupon">
+					<div
+						style={{
+							marginTop: "20px",
+							marginBottom: "20px",
+							marginLeft: "12px",
+						}}
+					>
+						<div className="list-coupon d-flex flex-wrap">
+							<div className="item">
+								<div className="wd-coupon d-flex" style={{ fontSize: "14px" }}>
+									<div className="wd-coupon-left d-flex">
+										<strong>35k</strong>
+									</div>
+									<div className="wd-coupon-right">
+										<div className="wd-coupon-right-top pb-3">
+											<div className="fw-bold">Miễn Phí Vận Chuyển</div>
+											<span>Đơn hàng từ 5000k</span>
+										</div>
+										<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
+											<div className="wd-coupon-detail me-2">
+												<div>
+													<span>
+														Mã: <strong>FREESHIP</strong>
+													</span>
+												</div>
+												<span>HSD: 31/12/2024</span>
+											</div>
+											<div className="wd-coupon-copy">
+												<button
+													data-code="FREESHIP"
+													className="clone-coupon"
+													type="button"
+												>
+													Sao chép mã
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className="item">
+								<div className="wd-coupon d-flex" style={{ fontSize: "14px" }}>
+									<div className="wd-coupon-left d-flex">
+										<strong>35k</strong>
+									</div>
+									<div className="wd-coupon-right">
+										<div className="wd-coupon-right-top pb-3">
+											<div className="fw-bold">Miễn Phí Vận Chuyển</div>
+											<span>Đơn hàng từ 5000k</span>
+										</div>
+										<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
+											<div className="wd-coupon-detail me-2">
+												<div>
+													<span>
+														Mã: <strong>FREESHIP</strong>
+													</span>
+												</div>
+												<span>HSD: 31/12/2024</span>
+											</div>
+											<div className="wd-coupon-copy">
+												<button
+													data-code="FREESHIP"
+													className="clone-coupon"
+													type="button"
+												>
+													Sao chép mã
+												</button>
 											</div>
 										</div>
 									</div>
@@ -429,16 +541,587 @@ const ProductDetail = () => {
 						</div>
 					</div>
 				</div>
-				{/* <div className="product-same-type">
-				<div className="container-fluid pt-5">
-					<div className="mb-3">
-						<h3 className="fw-bold">SẢN PHẨM CÙNG LOẠI</h3>
-					</div>
-					<div className="list-product-same-type">
-						<ProductSlider />
+
+				<div
+					className="product-description-rating"
+					style={{ margin: "0 12px" }}
+				>
+					<div
+						className="container-fluid"
+						style={{
+							background: "#fff",
+							padding: "12px",
+						}}
+					>
+						<nav>
+							<div className="nav nav-tabs" id="nav-tab" role="tablist">
+								<button
+									className="nav-link active"
+									id="nav-description-tab"
+									data-bs-toggle="tab"
+									data-bs-target="#nav-description"
+									type="button"
+									role="tab"
+									aria-controls="nav-description"
+									aria-selected="true"
+								>
+									MÔ TẢ
+								</button>
+								<button
+									className="nav-link"
+									id="nav-rating-tab"
+									data-bs-toggle="tab"
+									data-bs-target="#nav-rating"
+									type="button"
+									role="tab"
+									aria-controls="nav-rating"
+									aria-selected="false"
+								>
+									ĐÁNH GIÁ SẢN PHẨM
+								</button>
+								<button
+									className="nav-link"
+									id="nav-payment-tab"
+									data-bs-toggle="tab"
+									data-bs-target="#nav-payment"
+									type="button"
+									role="tab"
+									aria-controls="nav-payment"
+									aria-selected="false"
+								>
+									CHÍNH SÁCH THANH TOÁN
+								</button>
+								<button
+									className="nav-link"
+									id="nav-return-tab"
+									data-bs-toggle="tab"
+									data-bs-target="#nav-return"
+									type="button"
+									role="tab"
+									aria-controls="nav-return"
+									aria-selected="false"
+								>
+									CHÍNH SÁCH ĐỔI TRẢ
+								</button>
+							</div>
+						</nav>
+						<div className="tab-content" id="nav-tabContent">
+							<div
+								className="tab-pane fade show active"
+								id="nav-description"
+								role="tabpanel"
+								aria-labelledby="nav-description-tab"
+							>
+								<p>&nbsp;</p>
+								<div className="product-description">
+									<div
+										dangerouslySetInnerHTML={{ __html: product.description }}
+									/>
+								</div>
+							</div>
+							<div
+								className="tab-pane fade"
+								id="nav-rating"
+								role="tabpanel"
+								aria-labelledby="nav-rating-tab"
+							>
+								<p>&nbsp;</p>
+								<div className="rating-content">
+									<div
+										className="content-header d-flex"
+										style={{ gap: "20px" }}
+									>
+										<div
+											className="content-left"
+											style={{
+												flex: 1,
+												background: "#EEEEEE",
+												display: "flex",
+												flexDirection: "column",
+												alignItems: "center",
+												justifyContent: "center",
+											}}
+										>
+											<p
+												style={{
+													color: "#000",
+													fontSize: "24px",
+													fontWeight: "500",
+												}}
+											>
+												Sao trung bình
+											</p>
+											<p
+												style={{
+													color: "#33FF33",
+													fontSize: "50px",
+													fontWeight: "bold",
+													padding: "15px 0px",
+												}}
+											>
+												{averageRating}
+											</p>
+											<p>({listRating.length} lượt đánh giá)</p>
+										</div>
+										<div
+											className="content-right"
+											style={{
+												flex: 1,
+											}}
+										>
+											<p
+												style={{
+													fontSize: "18px",
+													color: "#000",
+													fontWeight: "bold",
+													paddingBottom: "10px",
+												}}
+											>
+												{listRating.length} lượt đánh giá
+											</p>
+											<p style={{ fontSize: "14px" }}>
+												5 ⭐⭐⭐⭐⭐ (Có {ratingCounts[5] || 0} lượt đánh giá)
+											</p>
+											<p style={{ fontSize: "14px" }}>
+												4 ⭐⭐⭐⭐ (Có {ratingCounts[4] || 0} lượt đánh giá)
+											</p>
+											<p style={{ fontSize: "14px" }}>
+												3 ⭐⭐⭐ (Có {ratingCounts[3] || 0} lượt đánh giá)
+											</p>
+											<p style={{ fontSize: "14px" }}>
+												2 ⭐⭐ (Có {ratingCounts[2] || 0} lượt đánh giá)
+											</p>
+											<p style={{ fontSize: "14px" }}>
+												1 ⭐ (Có {ratingCounts[1] || 0} lượt đánh giá)
+											</p>
+										</div>
+									</div>
+									<div
+										className="content-center"
+										style={{
+											margin: "20px 0",
+										}}
+									>
+										<p className="fw-bold pb-1">Viết đánh giá của bạn</p>
+										<form className="form-review" onSubmit={handleSubmitRating}>
+											<div className="row">
+												{imageReview ? (
+													<div className="d-flex" style={{ gap: "20px" }}>
+														<div style={{ flex: 2 }}>
+															<img
+																src={imageReview}
+																alt="Selected"
+																accept="image/*"
+																style={{ width: "200px", height: "200px" }}
+															/>
+														</div>
+														<div style={{ flex: 10 }}>
+															<textarea
+																name="review"
+																type="text"
+																className="form-control"
+																style={{ height: "200px", fontSize: "14px" }}
+																placeholder="Viết đánh giá của bạn..."
+																required
+																value={review}
+																onChange={(e) => setReview(e.target.value)}
+															></textarea>
+														</div>
+													</div>
+												) : (
+													<div className="col-12">
+														<textarea
+															name="review"
+															type="text"
+															className="form-control"
+															style={{ height: "100px", fontSize: "14px" }}
+															placeholder="Viết đánh giá của bạn..."
+															required
+															value={review}
+															onChange={(e) => setReview(e.target.value)}
+														></textarea>
+													</div>
+												)}
+
+												<div className="col-10 mt-3 d-flex">
+													<div className="btn-upload-img-review pe-3">
+														<label htmlFor="add-image-review">
+															<i
+																className="bi bi-camera-fill"
+																style={{
+																	fontSize: "25px",
+																	padding: "3px 15px",
+																	background: "#EEEEEE",
+																	borderRadius: "5px",
+																	cursor: "pointer",
+																}}
+															></i>
+														</label>
+														<input
+															type="file"
+															id="add-image-review"
+															onChange={handleImageUpload}
+															style={{ display: "none", visibility: "none" }}
+														/>
+													</div>
+													<div className="star-rating">
+														<input
+															type="radio"
+															name="rating"
+															id="star-1"
+															className="rating-radio"
+															value="5"
+															checked={rating === Number(5)}
+															onChange={handleRatingChange}
+														></input>
+														<label for="star-1">
+															<i className="bi bi-star-fill"></i>
+														</label>
+														<input
+															type="radio"
+															name="rating"
+															id="star-2"
+															className="rating-radio"
+															value="4"
+															checked={rating === Number(4)}
+															onChange={handleRatingChange}
+														></input>
+														<label for="star-2">
+															<i className="bi bi-star-fill"></i>
+														</label>
+														<input
+															type="radio"
+															name="rating"
+															id="star-3"
+															className="rating-radio"
+															value="3"
+															checked={rating === Number(3)}
+															onChange={handleRatingChange}
+														></input>
+														<label for="star-3">
+															<i className="bi bi-star-fill"></i>
+														</label>
+														<input
+															type="radio"
+															name="rating"
+															id="star-4"
+															className="rating-radio"
+															value="2"
+															checked={rating === Number(2)}
+															onChange={handleRatingChange}
+														></input>
+														<label for="star-4">
+															<i className="bi bi-star-fill"></i>
+														</label>
+														<input
+															type="radio"
+															name="rating"
+															id="star-5"
+															className="rating-radio"
+															value="1"
+															checked={rating === Number(1)}
+															onChange={handleRatingChange}
+														></input>
+														<label for="star-5">
+															<i className="bi bi-star-fill"></i>
+														</label>
+													</div>
+												</div>
+												<div className="col-2 mt-3 d-flex justify-content-end">
+													<button type="submit" className="btn btn-primary">
+														Đăng
+													</button>
+												</div>
+											</div>
+										</form>
+									</div>
+									<div className="content-footer pt-3">
+										{listRating.map((item, index) => (
+											<div key={index} className="item pb-4 d-flex">
+												<img
+													src={user.avatar}
+													alt="Avatar"
+													style={{
+														maxWidth: "50px",
+														maxHeight: "50px",
+														borderRadius: "50%",
+													}}
+												/>
+												<div className="ms-3">
+													<p className="fw-bold">{user.user_Name}</p>
+													{item.rating === 1 ? (
+														<p>⭐</p>
+													) : item.rating === 2 ? (
+														<p>⭐⭐</p>
+													) : item.rating === 3 ? (
+														<p>⭐⭐⭐</p>
+													) : item.rating === 4 ? (
+														<p>⭐⭐⭐⭐</p>
+													) : (
+														<p>⭐⭐⭐⭐⭐</p>
+													)}
+													<p>{item.review}</p>
+													{item.imageReview && (
+														<img
+															src={item.imageReview}
+															alt="Review"
+															style={{ width: "50px" }}
+														/>
+													)}
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+							</div>
+							<div
+								className="tab-pane fade"
+								id="nav-payment"
+								role="tabpanel"
+								aria-labelledby="nav-payment-tab"
+							>
+								<div className="more-description">
+									<p>&nbsp;</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											<strong>1. Giới thiệu</strong>
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											Chào mừng quý khách hàng đến với website của ShoesShop
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											Khi quý khách hàng truy cập vào trang website của chúng
+											tôi có nghĩa là quý khách đồng ý với các điều khoản này.
+											Trang web có quyền thay đổi, chỉnh sửa, thêm hoặc lược bỏ
+											bất kỳ phần nào trong Điều khoản mua bán hàng hóa này, vào
+											bất cứ lúc nào. Các thay đổi có hiệu lực ngay khi được
+											đăng trên trang web mà không cần thông báo trước. Và khi
+											quý khách tiếp tục sử dụng trang web, sau khi các thay đổi
+											về Điều khoản này được đăng tải, có nghĩa là quý khách
+											chấp nhận với những thay đổi đó.
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											Quý khách hàng vui lòng kiểm tra thường xuyên để cập nhật
+											những thay đổi của chúng tôi.
+										</span>
+									</p>
+									<p>&nbsp;</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											<strong>2. Hướng dẫn sử dụng website</strong>
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											Khi vào web của chúng tôi, khách hàng phải đảm bảo đủ 18
+											tuổi, hoặc truy cập dưới sự giám sát của cha mẹ hay người
+											giám hộ hợp pháp. Khách hàng đảm bảo có đầy đủ hành vi dân
+											sự để thực hiện các giao dịch mua bán hàng hóa theo quy
+											định hiện hành của pháp luật Việt Nam.
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											Trong suốt quá trình đăng ký, quý khách đồng ý nhận email
+											quảng cáo từ website. Nếu không muốn tiếp tục nhận mail,
+											quý khách có thể từ chối bằng cách nhấp vào đường link ở
+											dưới cùng trong mọi email quảng cáo.
+										</span>
+									</p>
+									<p>&nbsp;</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											<strong>3. Thanh toán an toàn và tiện lợi</strong>
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											Người mua có thể tham khảo các phương thức thanh toán sau
+											đây và lựa chọn áp dụng phương thức phù hợp:
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											<strong>
+												<u>Cách 1</u>
+											</strong>
+											: Thanh toán trực tiếp (người mua nhận hàng tại địa chỉ
+											cửa hàng)
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											<strong>
+												<u>Cách 2</u>
+											</strong>
+											: Thanh toán sau (COD – giao hàng và thu tiền tận nơi)
+										</span>
+									</p>
+									<p>
+										<span className="wysiwyg-font-size-medium">
+											<strong>
+												<u>Cách 3</u>
+											</strong>
+											: Thanh toán online qua chuyển khoản
+										</span>
+									</p>
+									<p>&nbsp;</p>
+								</div>
+							</div>
+							<div
+								className="tab-pane fade"
+								id="nav-return"
+								role="tabpanel"
+								aria-labelledby="nav-return-tab"
+							>
+								<div className="more-description">
+									<p>&nbsp;</p>
+									<p>
+										<strong>
+											ShoesShop.vn luôn trân trọng sự tín nhiệm của quý khách
+											giành cho chúng tôi. Chính vì vậy, chúng tôi luôn cố gắng
+											để mang đến quý khách hàng những sản phẩm chất lượng cao
+											và tiết kiệm chi phí.
+										</strong>
+									</p>
+									<p>
+										Thay cho cam kết về chất lượng sản phẩm, ShoesShop.vn thực
+										hiện chính sách đổi trả hàng hóa. Theo đó, tất cả các sản
+										phẩm được mua tại ShoesShop.vn đều có thể đổi size và mẫu
+										trong vòng 07 ngày sau khi nhận hàng.
+									</p>
+									<p>
+										Để được thực hiện đổi hàng hoá, Quý khách cần giữ lại Hóa
+										đơn mua hàng tại ShoesShop.vn. Sản phẩm được đổi là những
+										sản phẩm đáp ứng được những điều kiện trong Chính sách đổi
+										trả hàng hóa.
+									</p>
+									<p>&nbsp;</p>
+									<p>
+										<strong>
+											ShoesShop.vn thực hiện đổi hàng/trả lại tiền cho Quý
+											khách, nhưng không hoàn lại phí vận chuyển hoặc lệ phí
+											giao hàng, trừ những trường hợp sau:
+										</strong>
+									</p>
+									<ul className="ps-4">
+										<li>
+											Không đúng chủng loại, mẫu mã như quý khách đặt hàng.
+										</li>
+										<li>
+											Tình trạng bên ngoài bị ảnh hưởng như bong tróc, bể vỡ xảy
+											ra trong quá trình vận chuyển,…
+										</li>
+										<li>
+											Không đạt chất lượng như: phát hiện hàng fake, hàng kém
+											chất lượng, không phải hàng chính hãng.
+										</li>
+									</ul>
+									<p>
+										Quý khách vui lòng kiểm tra hàng hóa và ký nhận tình trạng
+										với nhân viên giao hàng ngay khi nhận được hàng. Khi phát
+										hiện một trong các trường hợp trên, quý khách có thể trao
+										đổi trực tiếp với nhân viên giao hàng hoặc phản hồi cho
+										chúng tôi trong vòng 24h theo số Hotline: 084. 850. 6666
+									</p>
+									<p>&nbsp;</p>
+									<p>
+										<strong>
+											ShoesShop.vn sẽ không chấp nhận đổi/trả hàng khi:
+										</strong>
+									</p>
+									<ul className="ps-4">
+										<li>Hàng hoá là hàng order.</li>
+										<li>
+											Thời điểm thông báo đổi trả quá 07 ngày kể từ khi Quý
+											khách nhận hàng.
+										</li>
+										<li>
+											Quý khách tự làm ảnh hưởng tình trạng bên ngoài như rách
+											bao bì, bong tróc, bể vỡ, bị bẩn, hư hại (không còn như
+											nguyên vẹn ban đầu),...
+										</li>
+										<li>
+											Quý khách vận hành không đúng chỉ dẫn gây hỏng hóc hàng
+											hóa.
+										</li>
+										<li>
+											Quý khách đã kiểm tra và ký nhận tình trạng hàng hóa nhưng
+											không có phản hồi trong vòng 24h kể từ lúc ký nhận hàng.
+										</li>
+										<li>Không còn size/mẫu mà khách hàng muốn đổi.</li>
+										<li>Không đổi từ hàng hóa có sẵn sang hàng phải order.</li>
+										<li>Sản phẩm đã cắt tag/mác.</li>
+										<li>Sản phẩm đã qua sử dụng.</li>
+									</ul>
+									<p>&nbsp;</p>
+									<p>
+										<strong>
+											ShoesShop thực hiện đổi trả theo quy trình sau:
+										</strong>
+									</p>
+									<ul className="ps-4">
+										<li>
+											<strong>Bước 1:</strong> Quý khách liên hệ trực tiếp với
+											ShoesShop qua số Hotline: 084. 850. 6666 để thông báo tình
+											trạng hàng hoá cần đổi/trả trong vòng 07 ngày kể từ khi
+											nhận hàng.
+										</li>
+										<li>
+											<strong>Bước 2:</strong> Nhân viên ShoesShop sẽ tiếp nhận
+											phản hồi và hướng dẫn bạn cung cấp thông tin đơn hàng để
+											chúng tôi truy soát.
+										</li>
+										<li>
+											<strong>Bước 3:</strong> Quý khách ship hàng cần đổi/trả
+											kèm hoá đơn lại về địa chỉ của ShoesShop để chúng tôi kiểm
+											tra.
+										</li>
+										<li>
+											<strong>Bước 4:</strong> Sau khi kiểm tra hàng và xác nhận
+											đủ sản phẩm đủ điều kiện đổi/trả, ShoesShop sẽ liên hệ lại
+											xác nhận với bạn và gửi hàng về cho bạn theo địa chỉ bạn
+											cung cấp.
+										</li>
+									</ul>
+									<p>&nbsp;</p>
+									<p>
+										<em>
+											Lưu ý: Quý khách sẽ phải chịu phí ship 2 chiều khi
+											đổi/trả. Chỉ hỗ trợ đổi sản phẩm một lần duy nhất.
+										</em>
+									</p>
+									<p>&nbsp;</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div> */}
+
+				<div className="viewed-products pt-3">
+					<div className="container-fluid">
+						<div className="mb-3">
+							<h3
+								className="fw-bold"
+								style={{
+									textAlign: "center",
+								}}
+							>
+								SẢN PHẨM ĐÃ XEM
+							</h3>
+							<p></p>
+						</div>
+						{/* <div className="list-viewed-products">
+							<ProductSlider />
+						</div> */}
+					</div>
+				</div>
 			</div>
 		</div>
 	);

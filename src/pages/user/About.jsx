@@ -65,11 +65,11 @@ const About = () => {
 						hiệu uy tín trong ngành giày dép.
 					</p>
 
-					<img
+					{/* <img
 						src="your-image-url-here"
 						alt="Lịch sử phát triển"
 						style={{ width: "100%", height: "auto", marginTop: "20px" }}
-					/>
+					/> */}
 
 					<h4
 						style={{
@@ -88,11 +88,11 @@ const About = () => {
 						lượng sản phẩm và dịch vụ của mình.
 					</p>
 
-					<img
+					{/* <img
 						src="your-image-url-here"
 						alt="Sứ mệnh"
 						style={{ width: "100%", height: "auto", marginTop: "20px" }}
-					/>
+					/> */}
 
 					<h4
 						style={{

@@ -113,9 +113,9 @@ const EditUser = () => {
 									name="password"
 									type="text"
 									className="form-control"
-									placeholder="Mật khẩu"
-									value={password}
-									onChange={(e) => setPasswword(e.target.value)}
+									// placeholder="Mật khẩu"
+									// value={password}
+									// onChange={(e) => setPasswword(e.target.value)}
 									disabled
 								/>
 							</div>

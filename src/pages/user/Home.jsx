@@ -123,6 +123,81 @@ const Home = () => {
 					</div>
 				</div>
 			</div>
+			<div className="coupon">
+				<div className="container-fluid pt-5">
+					<div className="top-title pb-3 d-flex justify-content-start">
+						<span class="border border-2 border-black"></span>
+						<h3 className="ps-2 fw-bold">MÃ GIẢM GIÁ</h3>
+					</div>
+					<div className="list-coupon d-flex flex-wrap">
+						<div className="item">
+							<div className="wd-coupon d-flex" style={{fontSize: "14px"}}>
+								<div className="wd-coupon-left d-flex">
+									<strong>35k</strong>
+								</div>
+								<div className="wd-coupon-right">
+									<div className="wd-coupon-right-top pb-3">
+										<div className="fw-bold">Miễn Phí Vận Chuyển</div>
+										<span>Đơn hàng từ 5000k</span>
+									</div>
+									<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
+										<div className="wd-coupon-detail me-2">
+											<div>
+												<span>
+													Mã: <strong>FREESHIP</strong>
+												</span>
+											</div>
+											<span>HSD: 31/12/2024</span>
+										</div>
+										<div className="wd-coupon-copy">
+											<button
+												data-code="FREESHIP"
+												className="clone-coupon"
+												type="button"
+											>
+												Sao chép mã
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div className="item">
+							<div className="wd-coupon d-flex" style={{fontSize: "14px"}}>
+								<div className="wd-coupon-left d-flex">
+									<strong>35k</strong>
+								</div>
+								<div className="wd-coupon-right">
+									<div className="wd-coupon-right-top pb-3">
+										<div className="fw-bold">Miễn Phí Vận Chuyển</div>
+										<span>Đơn hàng từ 5000k</span>
+									</div>
+									<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
+										<div className="wd-coupon-detail me-2">
+											<div>
+												<span>
+													Mã: <strong>FREESHIP</strong>
+												</span>
+											</div>
+											<span>HSD: 31/12/2024</span>
+										</div>
+										<div className="wd-coupon-copy">
+											<button
+												data-code="FREESHIP"
+												className="clone-coupon"
+												type="button"
+											>
+												Sao chép mã
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div className="new-arrival">
 				<div className="container-fluid pt-5">
 					<div className="mb-3">

@@ -82,6 +82,17 @@ const OrderDetail = () => {
 		}
 	};
 
+	const handleHuyDon = async (order_id) => {
+		try {
+			await orderService.updateStatus(order_id, "Canceled");
+			toast.success("Hủy đơn hàng thành công.");
+			fetchOrderDetail();
+		} catch (error) {
+			toast.error("Hủy đơn hàng thất bại.");
+			console.log("Update status order fail: ", error);
+		}
+	};
+
 	if (!orderDetail) {
 		return <div className="fs-1 text-danger">Loading...</div>;
 	}
@@ -309,22 +320,32 @@ const OrderDetail = () => {
 									orderDetail.total
 								)}₫`}</span>
 							</div>
-							{(orderDetail.status === "Pending" ||
-								orderDetail.status === "Delivering") && (
-								<div className="d-flex mt-4">
-									<div style={{ flex: 6 }}></div>
-									<div style={{ flex: 6 }}>
-										<button
-											onClick={handleUpdateStatus}
-											className="btn btn-success px-3 py-2 fw-bold"
-										>
-											{orderDetail.status === "Pending"
-												? "Xác nhận đơn hàng"
-												: "Hoàn tất đơn hàng"}
-										</button>
+							<div className="d-flex justify-content-end align-items-center mt-4">
+								{(orderDetail.status === "Pending" ||
+									orderDetail.status === "Delivering") && (
+									<div className="d-flex">
+										<div>
+											<button
+												onClick={handleUpdateStatus}
+												className="btn btn-success px-3 py-2 fw-bold"
+											>
+												{orderDetail.status === "Pending"
+													? "Xác nhận đơn hàng"
+													: "Hoàn tất đơn hàng"}
+											</button>
+										</div>
 									</div>
-								</div>
-							)}
+								)}
+								{(orderDetail.status === "Pending" ||
+									orderDetail.status === "Delivering") && (
+									<button
+										onClick={() => handleHuyDon(orderDetail.id)}
+										className="btn btn-danger px-3 py-2 ms-3"
+									>
+										Hủy đơn hàng
+									</button>
+								)}
+							</div>
 						</div>
 					</div>
 				</div>
