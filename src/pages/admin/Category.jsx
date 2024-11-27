@@ -148,7 +148,7 @@ const Category = () => {
 											<td>{item.category_Name}</td>
 											<td>
 												<img
-													src={item.category_Image}
+													src={item.category_image}
 													alt="Category Image"
 													style={{ width: "60px" }}
 												/>

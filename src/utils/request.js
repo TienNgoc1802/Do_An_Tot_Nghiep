@@ -39,3 +39,18 @@ export const paymentRequest = axios.create({
 	baseURL: "http://localhost:8090/api/v1/payment",
 	timeout: 5000,
 });
+
+export const brandRequest = axios.create({
+	baseURL: "http://localhost:8090/api/v1/brands",
+	timeout: 5000,
+});
+
+export const ratingRequest = axios.create({
+	baseURL: "http://localhost:8090/api/v1/ratings",
+	timeout: 5000,
+});
+
+export const voucherRequest = axios.create({
+	baseURL: "http://localhost:8090/api/v1/vouchers",
+	timeout: 5000,
+});

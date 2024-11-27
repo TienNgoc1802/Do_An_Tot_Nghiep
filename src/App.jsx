@@ -43,6 +43,10 @@ import Profile from "./pages/admin/Profile";
 import Contact from "./pages/user/Contact";
 import About from "./pages/user/About";
 import VNPayResponsive from "./pages/user/VNPayResponsive";
+import Delivery from "./pages/admin/Delivery";
+import Voucher from "./pages/admin/Voucher";
+import AddVoucher from "./pages/admin/AddVoucher";
+import EditVoucher from "./pages/admin/EditVoucher";
 
 const App = () => {
 	return (
@@ -124,6 +128,10 @@ const AppContent = () => {
 					<Route path="products/add-product" element={<AddProduct />} />
 					<Route path="products/edit-product/:id" element={<EditProduct />} />
 					<Route path="profile" element={<Profile />} />
+					<Route path="delivery" element={<Delivery />} />
+					<Route path="vouchers" element={<Voucher />} />
+					<Route path="vouchers/add-voucher" element={<AddVoucher />} />
+					<Route path="vouchers/edit-voucher/:id" element={<EditVoucher />} />
 				</Route>
 			</Routes>
 			{!isSignInPage && !isAdminPage && !isVNPayResponsive && <Footer />}

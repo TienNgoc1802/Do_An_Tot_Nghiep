@@ -128,100 +128,106 @@ const ModalAddToCart = ({ isOpen, onClose, product, setIsModalOpen }) => {
 			aria-hidden="false"
 		>
 			<div
-				className="modal-add-to-cart modal-dialog modal-dialog-centered"
-				role="document"
+				className="modal-overlay"
+				onClick={onClose} // Đóng modal khi click overlay
 			>
 				<div
-					className="modal-content"
-					style={{ padding: "10px", textAlign: "center" }}
+					className="modal-add-to-cart modal-dialog modal-dialog-centered"
+					role="document"
+					onClick={(e) => e.stopPropagation()} // Ngăn click từ modal lan ra overlay
 				>
-					<div className="modal-body">
-						<h3 className="fw-bold">Chọn kích thước & số lượng</h3>
-						<p>
-							<strong>Còn lại: {countSize} sản phẩm</strong>
-						</p>
-						<div className="d-flex justify-content-center align-items-center">
-							<div className="media-size">
-								<select
-									className="size-selector me-4 p-2 fw-bold"
-									value={size}
-									onChange={(e) => {
-										const selectedSize = e.target.value;
-										setSize(selectedSize);
-
-										const foundSize = product.productSize.find(
-											(item) => item.size.toString() === selectedSize
-										);
-
-										if (foundSize) {
-											console.log("Setting countSize to:", foundSize.quantity);
-											setCountSize(foundSize.quantity);
-										}
-									}}
+					<div
+						className="modal-content"
+						style={{ padding: "10px", textAlign: "center" }}
+					>
+						<div className="modal-body">
+							<h3 className="fw-bold">Chọn kích thước & số lượng</h3>
+							<p>
+								<strong>Còn lại: {countSize} sản phẩm</strong>
+							</p>
+							<div className="d-flex justify-content-center align-items-center">
+								<div className="media-size">
+									<select
+										className="size-selector me-4 p-2 fw-bold"
+										value={size}
+										onChange={(e) => {
+											const selectedSize = e.target.value;
+											setSize(selectedSize);
+	
+											const foundSize = product.productSize.find(
+												(item) => item.size.toString() === selectedSize
+											);
+	
+											if (foundSize) {
+												console.log("Setting countSize to:", foundSize.quantity);
+												setCountSize(foundSize.quantity);
+											}
+										}}
+									>
+										{product.productSize.map((size, index) => (
+											<option key={index} value={size.size}>
+												{size.size}
+											</option>
+										))}
+									</select>
+								</div>
+								<div
+									className="quantity-title d-flex justify-content-start align-items-center"
+									style={{ padding: "20px 0" }}
 								>
-									{product.productSize.map((size, index) => (
-										<option key={index} value={size.size}>
-											{size.size}
-										</option>
-									))}
-								</select>
+									<button
+										type="button"
+										onClick={decreaseQuantity}
+										className="qty-btn"
+									>
+										<i className="bi bi-dash fs-4"></i>
+									</button>
+									<input
+										type="text"
+										id="quantity"
+										name="quantity"
+										value={quantity}
+										min="1"
+										onChange={handleQuantityInputChange}
+										className="quantity-input"
+									></input>
+									<button
+										type="button"
+										onClick={increaseQuantity}
+										className="qty-btn"
+									>
+										<i className="bi bi-plus fs-4"></i>
+									</button>
+								</div>
 							</div>
-							<div
-								className="quantity-title d-flex justify-content-start align-items-center"
-								style={{ padding: "20px 0" }}
+							<button
+								className="btn btn-add-to-cart"
+								style={{
+									fontWeight: "600",
+									color: "#fff",
+									border: "1px solid red",
+									background: "red",
+									padding: "10px 15px",
+								}}
+								onClick={handleAddToCart}
 							>
-								<button
-									type="button"
-									onClick={decreaseQuantity}
-									className="qty-btn"
-								>
-									<i className="bi bi-dash fs-4"></i>
-								</button>
-								<input
-									type="text"
-									id="quantity"
-									name="quantity"
-									value={quantity}
-									min="1"
-									onChange={handleQuantityInputChange}
-									className="quantity-input"
-								></input>
-								<button
-									type="button"
-									onClick={increaseQuantity}
-									className="qty-btn"
-								>
-									<i className="bi bi-plus fs-4"></i>
-								</button>
-							</div>
+								THÊM VÀO GIỎ HÀNG
+							</button>
 						</div>
-						<button
-							className="btn btn-add-to-cart"
-							style={{
-								fontWeight: "600",
-								color: "#fff",
-								border: "1px solid red",
-								background: "red",
-								padding: "10px 15px",
-							}}
-							onClick={handleAddToCart}
-						>
-							THÊM VÀO GIỎ HÀNG
-						</button>
+						<Link to={`/products/${product.id}`}>
+							<span
+								className="text-info text-decoration-underline"
+								style={{ fontSize: "14px" }}
+							>
+								Xem chi tiết sản phẩm
+							</span>
+						</Link>
+						<button className="btn-close" onClick={onClose}></button>
 					</div>
-					<Link to={`/products/${product.id}`}>
-						<span
-							className="text-info text-decoration-underline"
-							style={{ fontSize: "14px" }}
-						>
-							Xem chi tiết sản phẩm
-						</span>
-					</Link>
-					<button className="btn-close" onClick={onClose}></button>
 				</div>
 			</div>
 		</div>
 	);
-};
+}
 
 export default ModalAddToCart;

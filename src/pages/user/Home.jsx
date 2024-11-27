@@ -1,16 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Carousel from "../../components/Carousel";
 import ProductSlider from "../../components/ProductSlider";
 import * as productService from "../../services/ProductService";
+import * as voucherService from "../../services/VoucherService";
 import { Link } from "react-router-dom";
 import car from "../../assets/image/fast-delivery.png";
 import wallet from "../../assets/image/wallet.png";
 import hours from "../../assets/image/support.png";
+import { AppContext } from "../../context/AppContext";
 
 const Home = () => {
 	const [newArrivals, setNewArrivals] = useState(null);
 	const [bestSellers, setBestSellers] = useState(null);
 	const [productIsOnSale, setProductIsOnSale] = useState(null);
+	const [voucher, setVoucher] = useState(null);
+	const { copiedCode, setCopiedCode } = useContext(AppContext); // Lưu mã đã sao chép
+	const [validVouchers, setValidVouchers] = useState([]);
+
+	const handleCopy = (code) => {
+		navigator.clipboard.writeText(code); // Sao chép mã vào clipboard
+		setCopiedCode(code); // Cập nhật trạng thái đã sao chép
+	};
 
 	const fetchNewArriavls = async () => {
 		try {
@@ -39,13 +49,38 @@ const Home = () => {
 		}
 	};
 
+	const fecthVoucher = async () => {
+		try {
+			const data = await voucherService.getAllVoucher();
+			setVoucher(data);
+			const currentTime = Date.now();
+			const validVouchers = data.filter(
+				(item) => item.expirationDate > currentTime
+			);
+
+			setValidVouchers(validVouchers);
+		} catch (error) {
+			console.log("fetch voucher is fail!", error);
+		}
+	};
+
+	const formatBookingDate = (milliseconds) => {
+		const date = new Date(milliseconds);
+		return date.toLocaleDateString("en-GB", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric",
+		});
+	};
+
 	useEffect(() => {
 		fetchNewArriavls();
 		fetchBestSellers();
 		fetchProductIsOnSale();
+		fecthVoucher();
 	}, []);
 
-	if (!newArrivals || !bestSellers || !productIsOnSale) {
+	if (!newArrivals || !bestSellers || !productIsOnSale || !voucher) {
 		return <div className="fs-1 text-danger">Loading...</div>;
 	}
 
@@ -130,71 +165,46 @@ const Home = () => {
 						<h3 className="ps-2 fw-bold">MÃ GIẢM GIÁ</h3>
 					</div>
 					<div className="list-coupon d-flex flex-wrap">
-						<div className="item">
-							<div className="wd-coupon d-flex" style={{fontSize: "14px"}}>
-								<div className="wd-coupon-left d-flex">
-									<strong>35k</strong>
-								</div>
-								<div className="wd-coupon-right">
-									<div className="wd-coupon-right-top pb-3">
-										<div className="fw-bold">Miễn Phí Vận Chuyển</div>
-										<span>Đơn hàng từ 5000k</span>
+						{validVouchers.map((item, index) => (
+							<div className="item" key={index}>
+								<div className="wd-coupon d-flex" style={{ fontSize: "14px" }}>
+									<div className="wd-coupon-left d-flex">
+										<strong>{item.discount / 1000}k</strong>
 									</div>
-									<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
-										<div className="wd-coupon-detail me-2">
-											<div>
+									<div className="wd-coupon-right">
+										<div className="wd-coupon-right-top pb-3">
+											<div className="fw-bold">{item.description}</div>
+											<span>Đơn hàng từ {item.paymentLimit / 1000}k</span>
+										</div>
+										<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
+											<div className="wd-coupon-detail me-2">
+												<div>
+													<span>
+														Mã: <strong>{item.code}</strong>
+													</span>
+												</div>
 												<span>
-													Mã: <strong>FREESHIP</strong>
+													HSD: {formatBookingDate(item.expirationDate)}
 												</span>
 											</div>
-											<span>HSD: 31/12/2024</span>
-										</div>
-										<div className="wd-coupon-copy">
-											<button
-												data-code="FREESHIP"
-												className="clone-coupon"
-												type="button"
-											>
-												Sao chép mã
-											</button>
+											<div className="wd-coupon-copy">
+												<button
+													className={`clone-coupon ${
+														copiedCode === item.code ? "copied" : ""
+													}`}
+													type="button"
+													onClick={() => handleCopy(item.code)}
+												>
+													{copiedCode === item.code
+														? "Đã sao chép"
+														: "Sao chép mã"}
+												</button>
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-
-						<div className="item">
-							<div className="wd-coupon d-flex" style={{fontSize: "14px"}}>
-								<div className="wd-coupon-left d-flex">
-									<strong>35k</strong>
-								</div>
-								<div className="wd-coupon-right">
-									<div className="wd-coupon-right-top pb-3">
-										<div className="fw-bold">Miễn Phí Vận Chuyển</div>
-										<span>Đơn hàng từ 5000k</span>
-									</div>
-									<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
-										<div className="wd-coupon-detail me-2">
-											<div>
-												<span>
-													Mã: <strong>FREESHIP</strong>
-												</span>
-											</div>
-											<span>HSD: 31/12/2024</span>
-										</div>
-										<div className="wd-coupon-copy">
-											<button
-												data-code="FREESHIP"
-												className="clone-coupon"
-												type="button"
-											>
-												Sao chép mã
-											</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+						))}
 					</div>
 				</div>
 			</div>

@@ -10,6 +10,7 @@ import vnpay from "../../assets/image/vnpay.jpg";
 import * as cartService from "../../services/CartService";
 import * as orderService from "../../services/OrderService";
 import * as paymentService from "../../services/PaymentService";
+import * as voucherService from "../../services/VoucherService";
 import toast from "react-hot-toast";
 
 const ModalSuccess = ({ isOpen }) => {
@@ -76,7 +77,7 @@ const ModalSuccess = ({ isOpen }) => {
 };
 
 const CheckOut = () => {
-	const { user, totalProductInCart, setTotalProductInCart} =
+	const { user, totalProductInCart, setTotalProductInCart } =
 		useContext(AppContext);
 	const [provinces, setProvinces] = useState([]);
 	const [districts, setDistricts] = useState([]);
@@ -94,6 +95,11 @@ const CheckOut = () => {
 	const [phone, setPhone] = useState(user.phone_Number);
 	const [transportFee, setTransportFee] = useState(30000);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [codeDiscount, setCodeDiscount] = useState("");
+	const [discount, setDiscount] = useState(0);
+	const { copiedCode } = useContext(AppContext);
+	const [vouchers, setVouchers] = useState([]);
+	const [copiedVoucher, setCopiedVoucher] = useState(null);
 
 	const fetchListCart = async () => {
 		try {
@@ -105,8 +111,26 @@ const CheckOut = () => {
 		}
 	};
 
+	const fetchVoucher = async () => {
+		try {
+			const data = await voucherService.getAllVoucher();
+			setVouchers(data);
+		} catch (error) {
+			console.log("fetch voucher is fail!", error);
+		}
+	};
+
+	useEffect(() => {
+		// Lấy voucher dựa trên copiedCode
+		if (copiedCode) {
+			const voucher = vouchers.find((item) => item.code === copiedCode);
+			setCopiedVoucher(voucher); // Lưu voucher đã sao chép
+		}
+	}, [copiedCode, vouchers]);
+
 	useEffect(() => {
 		fetchListCart();
+		fetchVoucher();
 	}, [totalProductInCart]);
 
 	const calculateTotal = (items) => {
@@ -216,7 +240,7 @@ const CheckOut = () => {
 	const handleSubmitCheckOut = async (e) => {
 		e.preventDefault();
 		let finalAddress = `${address}, ${getSelectedWardName()}, ${getSelectedDistrictName()}, ${getSelectedProvinceName()}`;
-		let finalTotal = total + transportFee;
+		let finalTotal = total + transportFee - discount;
 
 		if (selectedPaymentMethod == "Pay On VNPay") {
 			let userId = user.id;
@@ -228,7 +252,7 @@ const CheckOut = () => {
 				selectedPaymentMethod,
 				finalTotal,
 			};
-			localStorage.setItem('order', JSON.stringify(order));
+			localStorage.setItem("order", JSON.stringify(order));
 			try {
 				const data = await paymentService.creatPaymentURL(finalTotal);
 				if (data) {
@@ -258,6 +282,22 @@ const CheckOut = () => {
 				console.log("Check out fail: ", error);
 			}
 		}
+	};
+
+	const handleApDung = (copiedVoucher) => {
+		if (copiedVoucher.numberUsed >= copiedVoucher.limitNumber) {
+			toast.error("Mã giảm giá đã đạt giới hạn sử dụng.");
+		} else if (copiedVoucher.paymentLimit > total) {
+			toast.error("Không đủ điều kiện áp dụng mã giảm giá.");
+		} else {
+			setDiscount(copiedVoucher.discount);
+			setCodeDiscount(copiedCode);
+		}
+	};
+
+	const handleHuy = () => {
+		setDiscount(0);
+		setCodeDiscount("");
 	};
 
 	return (
@@ -649,14 +689,27 @@ const CheckOut = () => {
 											id="voucher"
 											className="form-control"
 											placeholder="Mã giảm giá"
-											required
+											value={codeDiscount}
+											onChange={(e) => setCodeDiscount(e.target.value)}
 										></input>
 									</div>
 									<div className="col-6 d-flex justify-content-end">
-										<button className="btn btn-info btn-huy text-light me-3">
+										<button
+											className="btn btn-info btn-huy text-light me-3"
+											onClick={handleHuy}
+										>
 											Hủy
 										</button>
-										<button className="btn btn-info btn-ap-dung text-light">
+										<button
+											className="btn btn-info btn-ap-dung text-light"
+											onClick={() => {
+												if (!copiedVoucher) {
+													console.error("No voucher selected!");
+													return;
+												}
+												handleApDung(copiedVoucher);
+											}}
+										>
 											Áp dụng
 										</button>
 									</div>
@@ -677,6 +730,14 @@ const CheckOut = () => {
 											)}₫`}
 										</span>
 									</div>
+									<div className="d-flex justify-content-between align-items-center mt-2">
+										<span className="total-line-name">Giảm giá</span>
+										<span className="total-line-price">
+											{" "}
+											<strong>-</strong>{" "}
+											{`${new Intl.NumberFormat("vi-VN").format(discount)}₫`}
+										</span>
+									</div>
 								</div>
 								<hr />
 								<div className="d-flex justify-content-between align-items-center mt-4">
@@ -694,7 +755,7 @@ const CheckOut = () => {
 										</span>
 										<span className="payment-due-price fs-4 fw-medium">
 											{`${new Intl.NumberFormat("vi-VN").format(
-												total + 30000
+												total + 30000 - discount
 											)}₫`}
 										</span>
 									</div>

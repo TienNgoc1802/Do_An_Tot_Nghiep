@@ -16,6 +16,7 @@ const Header = () => {
 
 	const handleSignOut = () => {
 		sessionStorage.removeItem("user");
+		//sessionStorage.removeItem("recentlyViewed");
 		setUser(null);
 		setTotalProductInCart(0);
 		navigate("/home");

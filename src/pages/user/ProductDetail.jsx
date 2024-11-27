@@ -5,8 +5,11 @@ import ProductSlider from "../../components/ProductSlider";
 import banner from "../../assets/image/shoe-banner.jpg";
 import * as productService from "../../services/ProductService";
 import * as cartService from "../../services/CartService";
+import * as voucherService from "../../services/VoucherService";
 import { AppContext } from "../../context/AppContext";
 import { toast } from "react-hot-toast";
+import { useLocation } from "react-router-dom";
+import * as ratingService from "../../services/RatingService";
 
 const ProductDetail = () => {
 	const { product_id } = useParams();
@@ -21,13 +24,56 @@ const ProductDetail = () => {
 	const [review, setReview] = useState(null);
 	const [rating, setRating] = useState(0);
 	const [listRating, setListRating] = useState([]);
+	const { copiedCode, setCopiedCode } = useContext(AppContext);
+	const [voucher, setVoucher] = useState([]);
+	const [validVouchers, setValidVouchers] = useState([]);
+	const location = useLocation();
+
+	const handleCopy = (code) => {
+		navigator.clipboard.writeText(code); // Sao chép mã vào clipboard
+		setCopiedCode(code); // Cập nhật trạng thái đã sao chép
+	};
+
+	// Lấy ID sản phẩm từ URL (ví dụ: /product/:id)
+	const productId = location.pathname.split("/").pop();
+
+	const fetchListRating = async () => {
+		try {
+			const data = await ratingService.getRatingsByProductId(product_id);
+			setListRating(data);
+		} catch (error) {
+			console.log("fetch list rating fail!", error);
+		}
+	};
+
+	const handleAddRating = async () => {
+		try {
+			const data = await ratingService.addRating(user.id, product_id, rating, review, imageReview);
+			if (data) {
+				toast.success("Đăng bài đánh giá thành công.");
+			}
+		} catch (error) {
+			toast.error("Đăng bài đánh giá thất bại.");
+			console.log("Add rating fail!", error);
+			return;
+		}
+	}
 
 	const handleSubmitRating = (e) => {
 		e.preventDefault();
+
+		if (user === null) {
+			toast.error("Bạn cần đăng nhập để đăng bài viết đánh giá.");
+			return;
+		}
+
+		handleAddRating();
+
 		const newRating = {
+			user: user,
 			review: review,
-			rating: rating,
-			imageReview: imageReview,
+			ratingValue: rating,
+			img: imageReview,
 		};
 
 		setListRating((prevList) => [...prevList, newRating]);
@@ -40,7 +86,10 @@ const ProductDetail = () => {
 	const calculateAverageRating = () => {
 		if (listRating.length === 0) return 0; // Tránh chia cho 0
 
-		const totalRating = listRating.reduce((acc, curr) => acc + curr.rating, 0);
+		const totalRating = listRating.reduce(
+			(acc, curr) => acc + curr.ratingValue,
+			0
+		);
 		return totalRating / listRating.length;
 	};
 
@@ -48,10 +97,10 @@ const ProductDetail = () => {
 
 	const countRatings = () => {
 		return listRating.reduce((acc, curr) => {
-			if (acc[curr.rating]) {
-				acc[curr.rating]++;
+			if (acc[curr.ratingValue]) {
+				acc[curr.ratingValue]++;
 			} else {
-				acc[curr.rating] = 1;
+				acc[curr.ratingValue] = 1;
 			}
 			return acc;
 		}, {});
@@ -132,20 +181,84 @@ const ProductDetail = () => {
 		}
 	};
 
+	const addProductToRecentlyViewed = (product) => {
+		const key = "recentlyViewed";
+		const storedProducts = sessionStorage.getItem(key);
+		let recentlyViewed = storedProducts ? JSON.parse(storedProducts) : [];
+
+		// Kiểm tra xem sản phẩm đã tồn tại trong danh sách chưa
+		const isProductExist = recentlyViewed.some(
+			(item) => item.id === product.id
+		);
+		if (!isProductExist) {
+			recentlyViewed.push(product);
+		}
+
+		// Giới hạn số lượng sản phẩm được lưu (ví dụ: tối đa 10 sản phẩm)
+		if (recentlyViewed.length > 10) {
+			recentlyViewed.shift();
+		}
+
+		// Lưu lại vào sessionStorage
+		sessionStorage.setItem(key, JSON.stringify(recentlyViewed));
+	};
+
+	const getRecentlyViewedProducts = () => {
+		const key = "recentlyViewed";
+		const storedProducts = sessionStorage.getItem(key);
+		return storedProducts ? JSON.parse(storedProducts) : [];
+	};
+
+	const [recentlyViewed, setRecentlyViewed] = useState([]);
+
+	const fecthVoucher = async () => {
+		try {
+			const data = await voucherService.getAllVoucher();
+			setVoucher(data);
+
+			const currentTime = Date.now();
+			const validVouchers = data.filter(
+				(item) => item.expirationDate > currentTime
+			);
+
+			setValidVouchers(validVouchers);
+		} catch (error) {
+			console.log("fetch voucher is fail!", error);
+		}
+	};
+
+	const formatBookingDate = (milliseconds) => {
+		const date = new Date(milliseconds);
+		return date.toLocaleDateString("en-GB", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric",
+		});
+	};
+
 	useEffect(() => {
+		if (!productId) return;
+
 		const fetchProductDetail = async () => {
 			try {
 				const data = await productService.getProductById(product_id);
 				setProduct(data);
 				setSize(data.productSize[focusedIndex].size);
 				setCountSize(data.productSize[focusedIndex].quantity);
+
+				addProductToRecentlyViewed(data);
 			} catch (error) {
 				console.log(error);
 			}
 		};
 
 		fetchProductDetail();
-	}, []);
+		fecthVoucher();
+		fetchListRating();
+
+		const products = getRecentlyViewedProducts();
+		setRecentlyViewed(products);
+	}, [productId]);
 
 	const handleAddToCart = async () => {
 		if (!user) {
@@ -465,79 +578,57 @@ const ProductDetail = () => {
 						</div>
 					</div>
 				</div>
-				<div className="coupon">
-					<div
-						style={{
-							marginTop: "20px",
-							marginBottom: "20px",
-							marginLeft: "12px",
-						}}
-					>
+
+				<div className="coupon mb-5">
+					<div className="container-fluid pt-5">
+						<div className="top-title pb-3 d-flex justify-content-start">
+							<span class="border border-2 border-black"></span>
+							<h3 className="ps-2 fw-bold">MÃ GIẢM GIÁ</h3>
+						</div>
 						<div className="list-coupon d-flex flex-wrap">
-							<div className="item">
-								<div className="wd-coupon d-flex" style={{ fontSize: "14px" }}>
-									<div className="wd-coupon-left d-flex">
-										<strong>35k</strong>
-									</div>
-									<div className="wd-coupon-right">
-										<div className="wd-coupon-right-top pb-3">
-											<div className="fw-bold">Miễn Phí Vận Chuyển</div>
-											<span>Đơn hàng từ 5000k</span>
+							{validVouchers.map((item, index) => (
+								<div className="item" key={index}>
+									<div
+										className="wd-coupon d-flex"
+										style={{ fontSize: "14px" }}
+									>
+										<div className="wd-coupon-left d-flex">
+											<strong>{item.discount / 1000}k</strong>
 										</div>
-										<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
-											<div className="wd-coupon-detail me-2">
-												<div>
+										<div className="wd-coupon-right">
+											<div className="wd-coupon-right-top pb-3">
+												<div className="fw-bold">{item.description}</div>
+												<span>Đơn hàng từ {item.paymentLimit / 1000}k</span>
+											</div>
+											<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
+												<div className="wd-coupon-detail me-2">
+													<div>
+														<span>
+															Mã: <strong>{item.code}</strong>
+														</span>
+													</div>
 													<span>
-														Mã: <strong>FREESHIP</strong>
+														HSD: {formatBookingDate(item.expirationDate)}
 													</span>
 												</div>
-												<span>HSD: 31/12/2024</span>
-											</div>
-											<div className="wd-coupon-copy">
-												<button
-													data-code="FREESHIP"
-													className="clone-coupon"
-													type="button"
-												>
-													Sao chép mã
-												</button>
+												<div className="wd-coupon-copy">
+													<button
+														className={`clone-coupon ${
+															copiedCode === item.code ? "copied" : ""
+														}`}
+														type="button"
+														onClick={() => handleCopy(item.code)}
+													>
+														{copiedCode === item.code
+															? "Đã sao chép"
+															: "Sao chép mã"}
+													</button>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							<div className="item">
-								<div className="wd-coupon d-flex" style={{ fontSize: "14px" }}>
-									<div className="wd-coupon-left d-flex">
-										<strong>35k</strong>
-									</div>
-									<div className="wd-coupon-right">
-										<div className="wd-coupon-right-top pb-3">
-											<div className="fw-bold">Miễn Phí Vận Chuyển</div>
-											<span>Đơn hàng từ 5000k</span>
-										</div>
-										<div className="wd-coupon-right-bottom d-flex justify-content-center align-items-center">
-											<div className="wd-coupon-detail me-2">
-												<div>
-													<span>
-														Mã: <strong>FREESHIP</strong>
-													</span>
-												</div>
-												<span>HSD: 31/12/2024</span>
-											</div>
-											<div className="wd-coupon-copy">
-												<button
-													data-code="FREESHIP"
-													className="clone-coupon"
-													type="button"
-												>
-													Sao chép mã
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+							))}
 						</div>
 					</div>
 				</div>
@@ -836,10 +927,10 @@ const ProductDetail = () => {
 										</form>
 									</div>
 									<div className="content-footer pt-3">
-										{listRating.map((item, index) => (
+										{listRating?.map((item, index) => (
 											<div key={index} className="item pb-4 d-flex">
 												<img
-													src={user.avatar}
+													src={listRating[index].user.avatar}
 													alt="Avatar"
 													style={{
 														maxWidth: "50px",
@@ -848,23 +939,25 @@ const ProductDetail = () => {
 													}}
 												/>
 												<div className="ms-3">
-													<p className="fw-bold">{user.user_Name}</p>
-													{item.rating === 1 ? (
+													<p className="fw-bold">
+														{listRating[index].user.user_Name}
+													</p>
+													{item.ratingValue === 1 ? (
 														<p>⭐</p>
-													) : item.rating === 2 ? (
+													) : item.ratingValue === 2 ? (
 														<p>⭐⭐</p>
-													) : item.rating === 3 ? (
+													) : item.ratingValue === 3 ? (
 														<p>⭐⭐⭐</p>
-													) : item.rating === 4 ? (
+													) : item.ratingValue === 4 ? (
 														<p>⭐⭐⭐⭐</p>
 													) : (
 														<p>⭐⭐⭐⭐⭐</p>
 													)}
 													<p>{item.review}</p>
-													{item.imageReview && (
+													{item.img && (
 														<img
-															src={item.imageReview}
-															alt="Review"
+															src={item.img}
+															alt="Review Image"
 															style={{ width: "50px" }}
 														/>
 													)}
@@ -1104,22 +1197,14 @@ const ProductDetail = () => {
 					</div>
 				</div>
 
-				<div className="viewed-products pt-3">
+				<div className="viewed-products pt-5">
 					<div className="container-fluid">
 						<div className="mb-3">
-							<h3
-								className="fw-bold"
-								style={{
-									textAlign: "center",
-								}}
-							>
-								SẢN PHẨM ĐÃ XEM
-							</h3>
-							<p></p>
+							<h3 className="fw-bold">SẢN PHẨM ĐÃ XEM</h3>
 						</div>
-						{/* <div className="list-viewed-products">
-							<ProductSlider />
-						</div> */}
+						<div className="list-viewed-products">
+							<ProductSlider products={recentlyViewed} />
+						</div>
 					</div>
 				</div>
 			</div>

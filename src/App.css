@@ -911,6 +911,11 @@ ul {
 	background-color: #a00000;
 }
 
+.coupon .list-coupon .item .wd-coupon .wd-coupon-right .clone-coupon.copied {
+	background-color: #a00000;
+	cursor: not-allowed;
+}
+
 .product-description-rating .nav-tabs .nav-link {
 	position: relative;
 	color: #000;
@@ -977,4 +982,17 @@ ul {
 
 .checkbox-list-status-order li input[type="radio"]:checked {
 	accent-color: #28a745;
+}
+
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1050;
 }

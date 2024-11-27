@@ -119,6 +119,24 @@ const SideBar = () => {
 					<i className="bi bi-bar-chart-line-fill"></i>
 					Thống kê
 				</Link>
+				<Link
+					to="/admin/delivery"
+					className={`item ${
+						location.pathname.startsWith("/admin/delivery") ? "active" : ""
+					}`}
+				>
+					<i className="bi bi-truck-flatbed"></i>
+					Giao hàng
+				</Link>
+				<Link
+					to="/admin/vouchers"
+					className={`item ${
+						location.pathname.startsWith("/admin/vouchers") ? "active" : ""
+					}`}
+				>
+					<i className="bi bi-percent"></i>
+					Mã giảm giá
+				</Link>
 			</div>
 		</div>
 	);
