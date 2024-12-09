@@ -15,9 +15,24 @@ const Shop = () => {
 	const [selectedCategory, setSelectedCategory] = useState(null);
 	const [selectedSortOption, setSelectedSortOption] = useState(null);
 	const [selectedPriceRange, setSelectedPriceRange] = useState(null);
+	const [isBrandOpen, setIsBrandOpen] = useState(true);
+	const [isPriceOpen, setIsPriceOpen] = useState(true);
+	const [isSizeOpen, setIsSizeOpen] = useState(true);
+	const [isSortOpen, setIsSortOpen] = useState(true);
+	const [isTypeOpen, setIsTypeOpen] = useState(true);
+
+	const listSize = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+	const listTypeShoes = [
+		"Giày thể thao",
+		"Sandal",
+		"Dép",
+		"Giày tây & Slip On",
+		"Boot & OxFord",
+	];
 
 	const priceRanges = {
-		"under-1000000": { min: 0, max: 1000000 },
+		"under-500000": { min: 0, max: 500000 },
+		"500000-1000000": { min: 500000, max: 1000000 },
 		"1000000-2000000": { min: 1000000, max: 2000000 },
 		"2000000-3000000": { min: 2000000, max: 3000000 },
 		"above-3000000": { min: 3000000, max: 10000000 },
@@ -120,37 +135,110 @@ const Shop = () => {
 						<div className="col-lg-3 col-3 shop-layout-filter">
 							<div className="shop-filter-content">
 								<div
+									className="filter-type"
+									style={{
+										background: "#fff",
+										marginRight: "12px",
+										marginBottom: "12px",
+										borderRadius: "4px",
+										boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+									}}
+								>
+									{/* <div className="d-flex justify-content-between">
+										<div className="filter-title">Danh mục sản phẩm</div>
+										{isBrandOpen ? (
+											<i
+												className="bi bi-dash fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsTypeOpen((prev) => !prev)}
+											></i>
+										) : (
+											<i
+												className="bi bi-plus fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsTypeOpen((prev) => !prev)}
+											></i>
+										)}
+									</div>
+									{isTypeOpen && (
+										<div>
+											<hr />
+											<div style={{ padding: "10px" }}>
+												<ul className="checkbox-list">
+													{listTypeShoes?.map((item, index) => (
+														<li key={index}>
+															<input
+																type="checkbox"
+																className="checkbox-item"
+																name="category"
+																value={item}
+																// checked={
+																// 	selectedCategory === category.category_Name
+																// }
+																// onChange={(e) =>
+																// 	setSelectedCategory(e.target.value)
+																// }
+															></input>
+															<label htmlFor="">{item}</label>
+														</li>
+													))}
+												</ul>
+											</div>
+										</div>
+									)} */}
+								</div>
+								<div
 									className="filter-bard"
 									style={{
 										background: "#fff",
 										marginRight: "12px",
 										marginBottom: "12px",
 										borderRadius: "4px",
+										boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 									}}
 								>
-									<div className="filter-title">Danh mục sản phẩm</div>
-									<hr />
-									<div style={{ padding: "10px" }}>
-										<ul className="checkbox-list">
-											{categories.map((category, index) => (
-												<li key={index}>
-													<input
-														type="radio"
-														className="checkbox-item"
-														name="category"
-														value={category.category_Name}
-														checked={
-															selectedCategory === category.category_Name
-														}
-														onChange={(e) =>
-															setSelectedCategory(e.target.value)
-														}
-													></input>
-													<label htmlFor="">{category.category_Name}</label>
-												</li>
-											))}
-										</ul>
+									<div className="d-flex justify-content-between">
+										<div className="filter-title">Thương hiệu</div>
+										{isBrandOpen ? (
+											<i
+												className="bi bi-dash fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsBrandOpen((prev) => !prev)}
+											></i>
+										) : (
+											<i
+												className="bi bi-plus fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsBrandOpen((prev) => !prev)}
+											></i>
+										)}
 									</div>
+									{isBrandOpen && (
+										<div>
+											<hr />
+											<div style={{ padding: "10px" }}>
+												<ul className="checkbox-list">
+													{categories.map((category, index) => (
+														<li key={index}>
+															<input
+																type="checkbox"
+																className="checkbox-item"
+																name="category"
+																value={category.category_Name}
+																checked={
+																	selectedCategory === category.category_Name
+																}
+																onChange={(e) =>
+																	setSelectedCategory(e.target.value)
+																}
+															></input>
+															<label htmlFor="">{category.category_Name}</label>
+														</li>
+													))}
+												</ul>
+											</div>
+										</div>
+									)}
 								</div>
 								<div
 									className="filter-price"
@@ -159,67 +247,160 @@ const Shop = () => {
 										marginRight: "12px",
 										marginBottom: "12px",
 										borderRadius: "4px",
+										boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 									}}
 								>
-									<div className="filter-title">Lọc giá</div>
-									<hr />
-									<div style={{ padding: "10px" }}>
-										<ul className="checkbox-list">
-											<li>
-												<input
-													type="radio"
-													className="checkbox-item"
-													name="priceRange"
-													value="under-1000000"
-													checked={selectedPriceRange === "under-1000000"}
-													onChange={(e) =>
-														setSelectedPriceRange(e.target.value)
-													}
-												/>
-												<label>Dưới 1.000.000₫</label>
-											</li>
-											<li>
-												<input
-													type="radio"
-													className="checkbox-item"
-													name="priceRange"
-													value="1000000-2000000"
-													checked={selectedPriceRange === "1000000-2000000"}
-													onChange={(e) =>
-														setSelectedPriceRange(e.target.value)
-													}
-												/>
-												<label>1.000.000₫ - 2.000.000₫</label>
-											</li>
-											<li>
-												<input
-													type="radio"
-													className="checkbox-item"
-													name="priceRange"
-													value="2000000-3000000"
-													checked={selectedPriceRange === "2000000-3000000"}
-													onChange={(e) =>
-														setSelectedPriceRange(e.target.value)
-													}
-												/>
-												<label>2.000.000₫ - 3.000.000₫</label>
-											</li>
-											<li>
-												<input
-													type="radio"
-													className="checkbox-item"
-													name="priceRange"
-													value="above-3000000"
-													checked={selectedPriceRange === "above-3000000"}
-													onChange={(e) =>
-														setSelectedPriceRange(e.target.value)
-													}
-												/>
-												<label>Trên 3.000.000₫</label>
-											</li>
-										</ul>
+									<div className="d-flex justify-content-between">
+										<div className="filter-title">Lọc giá</div>
+										{isPriceOpen ? (
+											<i
+												className="bi bi-dash fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsPriceOpen((prev) => !prev)}
+											></i>
+										) : (
+											<i
+												className="bi bi-plus fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsPriceOpen((prev) => !prev)}
+											></i>
+										)}
 									</div>
+									{isPriceOpen && (
+										<div>
+											<hr />
+											<div style={{ padding: "10px" }}>
+												<ul className="checkbox-list">
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="priceRange"
+															value="under-500000"
+															checked={selectedPriceRange === "under-500000"}
+															onChange={(e) =>
+																setSelectedPriceRange(e.target.value)
+															}
+														/>
+														<label>Dưới 500.000₫</label>
+													</li>
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="priceRange"
+															value="500000-1000000"
+															checked={selectedPriceRange === "500000-1000000"}
+															onChange={(e) =>
+																setSelectedPriceRange(e.target.value)
+															}
+														/>
+														<label>500.000₫ - 1.000.000₫</label>
+													</li>
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="priceRange"
+															value="1000000-2000000"
+															checked={selectedPriceRange === "1000000-2000000"}
+															onChange={(e) =>
+																setSelectedPriceRange(e.target.value)
+															}
+														/>
+														<label>1.000.000₫ - 2.000.000₫</label>
+													</li>
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="priceRange"
+															value="2000000-3000000"
+															checked={selectedPriceRange === "2000000-3000000"}
+															onChange={(e) =>
+																setSelectedPriceRange(e.target.value)
+															}
+														/>
+														<label>2.000.000₫ - 3.000.000₫</label>
+													</li>
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="priceRange"
+															value="above-3000000"
+															checked={selectedPriceRange === "above-3000000"}
+															onChange={(e) =>
+																setSelectedPriceRange(e.target.value)
+															}
+														/>
+														<label>Trên 3.000.000₫</label>
+													</li>
+												</ul>
+											</div>
+										</div>
+									)}
 								</div>
+
+								{/* <div
+									className="filter-size"
+									style={{
+										background: "#fff",
+										marginRight: "12px",
+										marginBottom: "12px",
+										borderRadius: "4px",
+										boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+									}}
+								>
+									<div className="d-flex justify-content-between">
+										<div className="filter-title">Kích thước</div>
+										{isSizeOpen ? (
+											<i
+												className="bi bi-dash fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsSizeOpen((prev) => !prev)}
+											></i>
+										) : (
+											<i
+												className="bi bi-plus fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsSizeOpen((prev) => !prev)}
+											></i>
+										)}
+									</div>
+									{isSizeOpen && (
+										<div>
+											<hr />
+											<div
+												style={{
+													padding: "10px",
+													maxHeight: "250px",
+													overflowY: "auto",
+												}}
+											>
+												<ul className="checkbox-list">
+													{listSize?.map((size, index) => (
+														<li key={index}>
+															<input
+																type="checkbox"
+																className="checkbox-item"
+																name="category"
+																value={size}
+																// checked={
+																// 	selectedCategory === category.category_Name
+																// }
+																// onChange={(e) =>
+																// 	setSelectedCategory(e.target.value)
+																// }
+															></input>
+															<label htmlFor="">{size}</label>
+														</li>
+													))}
+												</ul>
+											</div>
+										</div>
+									)}
+								</div> */}
 								<div
 									className="filter-arrange"
 									style={{
@@ -227,40 +408,100 @@ const Shop = () => {
 										marginRight: "12px",
 										marginBottom: "12px",
 										borderRadius: "4px",
+										boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 									}}
 								>
-									<div className="filter-title">Sắp xếp</div>
-									<hr />
-									<div style={{ padding: "10px" }}>
-										<ul className="checkbox-list">
-											<li>
-												<input
-													type="radio"
-													className="checkbox-item"
-													name="sortOrder"
-													value="asc"
-													checked={selectedSortOption === "asc"}
-													onChange={(e) =>
-														setSelectedSortOption(e.target.value)
-													}
-												/>
-												<label>Giá: Tăng dần</label>
-											</li>
-											<li>
-												<input
-													type="radio"
-													className="checkbox-item"
-													name="sortOrder"
-													value="desc"
-													checked={selectedSortOption === "desc"}
-													onChange={(e) =>
-														setSelectedSortOption(e.target.value)
-													}
-												/>
-												<label>Giá: Giảm dần</label>
-											</li>
-										</ul>
+									<div className="d-flex justify-content-between">
+										<div className="filter-title">Sắp xếp</div>
+										{isSortOpen ? (
+											<i
+												className="bi bi-dash fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsSortOpen((prev) => !prev)}
+											></i>
+										) : (
+											<i
+												className="bi bi-plus fs-3 pe-2"
+												style={{ cursor: "pointer" }}
+												onClick={() => setIsSortOpen((prev) => !prev)}
+											></i>
+										)}
 									</div>
+									{isSortOpen && (
+										<div>
+											<hr />
+											<div style={{ padding: "10px" }}>
+												<ul className="checkbox-list">
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="sortOrder"
+															value="asc"
+															checked={selectedSortOption === "asc"}
+															onChange={(e) =>
+																setSelectedSortOption(e.target.value)
+															}
+														/>
+														<label>Giá: Tăng dần</label>
+													</li>
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="sortOrder"
+															value="desc"
+															checked={selectedSortOption === "desc"}
+															onChange={(e) =>
+																setSelectedSortOption(e.target.value)
+															}
+														/>
+														<label>Giá: Giảm dần</label>
+													</li>
+
+													{/* <li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="sortOrder"
+															value="asc"
+															checked={selectedSortOption === "asc"}
+															onChange={(e) =>
+																setSelectedSortOption(e.target.value)
+															}
+														/>
+														<label>Tên: A-Z</label>
+													</li>
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="sortOrder"
+															value="asc"
+															checked={selectedSortOption === "asc"}
+															onChange={(e) =>
+																setSelectedSortOption(e.target.value)
+															}
+														/>
+														<label>Tên: Z-A</label>
+													</li>
+													<li>
+														<input
+															type="checkbox"
+															className="checkbox-item"
+															name="sortOrder"
+															value="asc"
+															checked={selectedSortOption === "asc"}
+															onChange={(e) =>
+																setSelectedSortOption(e.target.value)
+															}
+														/>
+														<label>Bán chạy nhất</label>
+													</li> */}
+												</ul>
+											</div>
+										</div>
+									)}
 								</div>
 								<button
 									onClick={() => {

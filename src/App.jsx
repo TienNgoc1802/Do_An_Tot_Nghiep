@@ -43,10 +43,13 @@ import Profile from "./pages/admin/Profile";
 import Contact from "./pages/user/Contact";
 import About from "./pages/user/About";
 import VNPayResponsive from "./pages/user/VNPayResponsive";
-import Delivery from "./pages/admin/Delivery";
+import Delivery from "./pages/admin/Shipper";
 import Voucher from "./pages/admin/Voucher";
 import AddVoucher from "./pages/admin/AddVoucher";
 import EditVoucher from "./pages/admin/EditVoucher";
+import ShippingType from "./pages/admin/ShippingType";
+import Shipper from "./pages/admin/Shipper";
+import MoMoResponsive from "./pages/user/MoMoResponsive";
 
 const App = () => {
 	return (
@@ -67,7 +70,8 @@ const AppContent = () => {
 		location.pathname === "/signup" ||
 		location.pathname === "/checkout";
 	const isAdminPage = location.pathname.startsWith("/admin");
-	const isVNPayResponsive = location.pathname.startsWith("/return-payment");
+	const isVNPayResponsive = location.pathname.startsWith("/paywithvnpay");
+	const isMomoResponsive = location.pathname.startsWith("/paywithmomo");
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -85,7 +89,7 @@ const AppContent = () => {
 
 	return (
 		<>
-			{!isSignInPage && !isAdminPage && !isVNPayResponsive && <Header currentPage="home" />}
+			{!isSignInPage && !isAdminPage && !isVNPayResponsive && !isMomoResponsive && <Header currentPage="home" />}
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/home" element={<Home />} />
@@ -106,7 +110,8 @@ const AppContent = () => {
 				<Route path="/account" element={<Account />} />
 				<Route path="/contact" element={<Contact />} />
 				<Route path="/about" element={<About/>} />
-				<Route path="/return-payment" element={<VNPayResponsive />} />
+				<Route path="/paywithvnpay" element={<VNPayResponsive />} />
+				<Route path="/paywithmomo" element={<MoMoResponsive />} />
 				<Route path="/admin/login" element={<LoginAdmin />} />
 				<Route path="/admin">
 					<Route path="dashboard" element={<Dashboard />} />
@@ -128,13 +133,14 @@ const AppContent = () => {
 					<Route path="products/add-product" element={<AddProduct />} />
 					<Route path="products/edit-product/:id" element={<EditProduct />} />
 					<Route path="profile" element={<Profile />} />
-					<Route path="delivery" element={<Delivery />} />
+					<Route path="shippers" element={<Shipper />} />
 					<Route path="vouchers" element={<Voucher />} />
 					<Route path="vouchers/add-voucher" element={<AddVoucher />} />
 					<Route path="vouchers/edit-voucher/:id" element={<EditVoucher />} />
+					<Route path="shippingType" element={<ShippingType />} />
 				</Route>
 			</Routes>
-			{!isSignInPage && !isAdminPage && !isVNPayResponsive && <Footer />}
+			{!isSignInPage && !isAdminPage && !isVNPayResponsive && !isMomoResponsive && <Footer />}
 		</>
 	);
 };

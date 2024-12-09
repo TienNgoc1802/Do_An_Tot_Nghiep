@@ -110,7 +110,7 @@ const Order = () => {
 				style={{ padding: "15px 20px", flex: "1" }}
 			>
 				<h3 className="fw-bold mb-4">Quản Lý Đơn Hàng</h3>
-				<form>
+				{/* <form>
 					<div className="row">
 						<div className="col-4">
 							<label className="form-label fw-bold">Mã đơn hàng</label>
@@ -227,8 +227,8 @@ const Order = () => {
 				<div className="d-flex mt-4">
 					<p style={{flex: 1, fontWeight: "bold"}}>Tổng đơn: 2</p>
 					<p style={{flex: 1, fontWeight: "bold"}}>Tổng gía trị đơn: 2</p>
-				</div>
-				{/* <div>
+				</div> */}
+				<div>
 					<span
 						style={{
 							cursor: "pointer",
@@ -287,7 +287,7 @@ const Order = () => {
 					>
 						Đã hủy({canceledOrder})
 					</span>
-				</div> */}
+				</div>
 				<div
 					className="mt-4"
 					style={{
@@ -301,11 +301,11 @@ const Order = () => {
 						<table className="table table-striped">
 							<thead>
 								<tr>
-									<th scope="col">#</th>
+									<th scope="col">Mã đơn</th>
 									<th scope="col">Tên người nhận</th>
 									<th scope="col">Số điện thoại</th>
 									<th scope="col">Ngày đặt</th>
-									<th scope="col">Phương thức thanh toán</th>
+									<th scope="col" style={{width: "10%"}}>Phương thức thanh toán</th>
 									<th scope="col">Trạng thái</th>
 									<th scope="col">Tổng tiền</th>
 									<th scope="col">Thao tác</th>
@@ -314,15 +314,15 @@ const Order = () => {
 							<tbody>
 								{order?.map((item, index) => (
 									<tr key={index}>
-										<th scope="row">#{item.id}</th>
+										<th scope="row">{item.id}</th>
 										<td>{item.fullname}</td>
 										<td>{item.phone}</td>
 										<td>{formatBookingDate(item.booking_Date)}</td>
 										<td>
 											{item.payment_Method === "Pay On Delivery"
 												? "Thanh toán khi nhận hàng"
-												: item.payment_Method === "Pay On Bank"
-												? "Chuyển khoản qua ngân hàng"
+												: item.payment_Method === "Pay On MoMo"
+												? "Thanh toán qua MoMo"
 												: "Thanh toán qua VNPay"}
 										</td>
 										<td>

@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import * as productService from "../services/ProductService";
 import { AppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
+import ERROR_CODES from "../utils/errorCodes";
 
 const ModalAddProduct = ({ isOpen, onClose }) => {
 	const [products, setProducts] = useState(null);
@@ -33,6 +35,15 @@ const ModalAddProduct = ({ isOpen, onClose }) => {
 			}
 		});
 	};
+
+	const handleXacNhan = () => {
+		if(selectedProducts.length === 0){
+			toast.error(ERROR_CODES.NO_SELECTED_PRODUCTS.message);
+		}
+		else{
+			onClose();
+		}
+	}
 
 	const isSelected = (product) =>
 		selectedProducts?.some((item) => item.id === product.id);
@@ -78,7 +89,10 @@ const ModalAddProduct = ({ isOpen, onClose }) => {
 				className="modal-overlay"
 				onClick={onClose} // Đóng modal khi click overlay
 			>
-				<div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+				<div
+					className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+					onClick={(e) => e.stopPropagation()}
+				>
 					<div className="modal-content">
 						<div className="modal-header d-flex justify-content-between align-items-center">
 							<h4 className="fw-bold">Chọn sản phẩm</h4>
@@ -90,40 +104,51 @@ const ModalAddProduct = ({ isOpen, onClose }) => {
 									className="product-item d-flex align-items-center mb-3"
 									key={index}
 								>
-									<input
-										type="checkbox"
-										checked={isSelected(item)}
-										onChange={() => handleCheckboxChange(item)}
-									/>
-									<img
-										src={item.productImage[0].url_Image}
-										alt="Product Image"
-										style={{ width: "60px", marginLeft: "15px" }}
-									/>
-									<div className="ms-3">
-										<p>{item.product_Name}</p>
-										<p>
-											<strong>Giá bán: </strong>
-											{`${new Intl.NumberFormat("vi-VN").format(item.price)}₫`}
-										</p>
-										<p>
-											<strong>Số lượng sản phẩm: </strong>
-											{SLT(item.productSize)}
-										</p>
-										<p>
-											<strong>Đã bán: </strong>
-											{item.sold}
-										</p>
-									</div>
+									<label
+										htmlFor={`checkbox-${item.id}`}
+										className="d-flex align-items-center"
+										style={{ cursor: "pointer", width: "100%" }}
+									>
+										{/* Checkbox */}
+										<input
+											id={`checkbox-${item.id}`}
+											type="checkbox"
+											checked={isSelected(item)}
+											onChange={() => handleCheckboxChange(item)}
+											style={{ cursor: "pointer" }} // Đảm bảo con trỏ hiển thị như khi rê qua checkbox
+										/>
+										{/* Hình ảnh sản phẩm */}
+										<img
+											src={item.productImage[0].url_Image}
+											alt="Product Image"
+											style={{ width: "60px", marginLeft: "15px" }}
+										/>
+										{/* Thông tin sản phẩm */}
+										<div className="ms-3">
+											<p>{item.product_Name}</p>
+											<p>
+												<strong>Giá bán: </strong>
+												{`${new Intl.NumberFormat("vi-VN").format(
+													item.price
+												)}₫`}
+											</p>
+											<p>
+												<strong>Số lượng sản phẩm: </strong>
+												{SLT(item.productSize)}
+											</p>
+											<p>
+												<strong>Đã bán: </strong>
+												{item.sold}
+											</p>
+										</div>
+									</label>
 								</div>
 							))}
 						</div>
 						<div className="modal-footer">
 							<button
 								type="button"
-								onClick={() => {
-									onClose();
-								}}
+								onClick={handleXacNhan}
 								class="btn btn-primary py-2 px-3"
 							>
 								Xác nhận

@@ -54,3 +54,13 @@ export const voucherRequest = axios.create({
 	baseURL: "http://localhost:8090/api/v1/vouchers",
 	timeout: 5000,
 });
+
+export const shippingTypeRequest = axios.create({
+	baseURL: "http://localhost:8090/api/v1/Shipping_Type",
+	timeout: 5000,
+});
+
+export const shipperRequest = axios.create({
+	baseURL: "http://localhost:8090/api/v1/Shippers",
+	timeout: 5000,
+})

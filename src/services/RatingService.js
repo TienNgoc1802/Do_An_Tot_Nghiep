@@ -1,4 +1,3 @@
-import { Await } from "react-router-dom";
 import { ratingRequest } from "../utils/request";
 
 export const getAllRating = async () => {
@@ -13,17 +12,16 @@ export const addRating = async (
 	review,
 	ratingImg
 ) => {
-	const params = new URLSearchParams();
-	params.append("user_id", user_id);
-	params.append("product_id", product_id);
 	const formData = new FormData();
+	formData.append("user_id", user_id);
+	formData.append("product_id", product_id || "");
 	formData.append("ratingValue", ratingValue);
 	formData.append("review", review);
 
 	if (ratingImg) {
 		const response = await fetch(ratingImg);
 		const blob = await response.blob();
-		formData.append(`ratingImg`, blob, `${ratingImg}.jpg`);
+		formData.append("RatingImage", blob, "rating.jpg"); // Sử dụng key "RatingImage" đúng với backend
 	}
 
 	const res = await ratingRequest.post("/add", formData, {

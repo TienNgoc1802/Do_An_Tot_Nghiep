@@ -287,7 +287,7 @@ const Account = () => {
 									{orders.map((order, index) => (
 										<div className="order-item mb-3" key={index}>
 											<div className="status d-flex justify-content-between mb-2">
-												<p className="fw-bold">Đơn hàng #{index + 1}:</p>
+												<p className="fw-bold">Mã đơn hàng: {order.id}</p>
 												<p
 													style={{
 														color: "#FF6600",
@@ -420,7 +420,7 @@ const Account = () => {
 											</div>
 											<hr />
 											<div className="d-flex justify-content-end align-items-center mt-2">
-												{(order.status !== "Completed" && order.status !== "Canceled") && (
+												{(order.status === "Pending") && (
 													<button
 														onClick={() => handleHuyDon(order.id)}
 														className="btn btn-danger px-3 py-2"

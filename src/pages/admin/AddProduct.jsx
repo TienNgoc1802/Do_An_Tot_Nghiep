@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import * as productService from "../../services/ProductService";
 import * as categoryServie from "../../services/CategoryService";
 import { Editor } from "@tinymce/tinymce-react";
+import ERROR_CODES from "../../utils/errorCodes";
 
 const AddProduct = () => {
 	const [name, setName] = useState("");
@@ -16,7 +17,7 @@ const AddProduct = () => {
 	const [sizes, setSizes] = useState([]);
 	const [images, setImages] = useState([]);
 	const [size, setSize] = useState(35);
-	const [quantity, setQuantity] = useState(1);
+	const [quantity, setQuantity] = useState("");
 	const navigate = useNavigate();
 
 	const handleImageUpload = (event) => {
@@ -47,10 +48,13 @@ const AddProduct = () => {
 
 			// Reset lại giá trị size và quantity sau khi thêm
 			setSize(35);
-			setQuantity(1);
+			setQuantity("");
 		} else {
-			// Thông báo nếu thiếu thông tin hoặc quantity không hợp lệ
-			toast.error("Vui lòng nhập đầy đủ và đúng thông tin.");
+			if (!size || !quantity) {
+				toast.error(ERROR_CODES.INVALID_SIZE_QUANTITY_INPUT.message);
+			} else if (isNaN(quantity) || quantity <= 0) {
+				toast.error(ERROR_CODES.QUANTITY_INVALID.message);
+			}
 		}
 	};
 
@@ -77,6 +81,18 @@ const AddProduct = () => {
 	const handleSubmitAddProduct = async (e) => {
 		e.preventDefault();
 
+		if (parseInt(price) <= 0) {
+			toast.error(ERROR_CODES.PRICE_INVALID.message);
+			return;
+		} else if (images.length === 0) {
+			toast.error(ERROR_CODES.IMAGES_EMPTY.message);
+			return;
+		}
+		else if(sizes.length ===0){
+			toast.error(ERROR_CODES.SIZES_EMPTY.message);
+			return;
+		}
+
 		try {
 			const data = await productService.addProduct(
 				name,
@@ -88,11 +104,11 @@ const AddProduct = () => {
 				sizes
 			);
 			if (data) {
-				toast.success("Thêm sản phẩm thành công.");
+				toast.success(ERROR_CODES.ADD_PRODUCT_SUCCESS.message);
 				navigate("/admin/products");
 			}
 		} catch (error) {
-			toast.error("Thêm sản phẩm thất bại.");
+			toast.error(ERROR_CODES.ADD_PROMOTION_FAIL.message);
 			console.error("Error response data:", error);
 		}
 	};
@@ -214,8 +230,8 @@ const AddProduct = () => {
 									className="form-control"
 									placeholder="Giá sản phẩm"
 									value={price}
-									required
 									onChange={(e) => setPrice(e.target.value)}
+									required
 								/>
 							</div>
 							<div className="col-4 col-lg-4 mt-3">
@@ -234,7 +250,7 @@ const AddProduct = () => {
 									))}
 								</select>
 							</div>
-							<div className="col-4 col-lg-4 mt-3">
+							{/* <div className="col-4 col-lg-4 mt-3">
 								<label className="form-label fw-bold">Trạng thái</label>
 								<div className="d-flex mt-2">
 									<div>
@@ -258,7 +274,7 @@ const AddProduct = () => {
 										<span className="ms-2">Dừng bán</span>
 									</div>
 								</div>
-							</div>
+							</div> */}
 						</div>
 
 						<div className="add-image mt-3">
@@ -282,6 +298,7 @@ const AddProduct = () => {
 									multiple
 									onChange={handleImageUpload}
 									style={{ display: "none", visibility: "none" }}
+									required
 								/>
 								<div className="image-gallery d-flex ms-4">
 									{images.map((image, index) => (
@@ -361,16 +378,15 @@ const AddProduct = () => {
 													onChange={(e) => setSize(Number(e.target.value))}
 													value={size}
 												>
-													{Array.from(
-														{ length: 11 },
-														(_, i) => 35 + i
-													).map((sizeOption) => (
-														<option key={sizeOption} value={sizeOption}>
-															{Number.isInteger(sizeOption)
-																? sizeOption
-																: sizeOption.toFixed(1)}
-														</option>
-													))}
+													{Array.from({ length: 11 }, (_, i) => 35 + i).map(
+														(sizeOption) => (
+															<option key={sizeOption} value={sizeOption}>
+																{Number.isInteger(sizeOption)
+																	? sizeOption
+																	: sizeOption.toFixed(1)}
+															</option>
+														)
+													)}
 												</select>
 											</td>
 											<td style={{ width: "150px" }}>
@@ -379,6 +395,7 @@ const AddProduct = () => {
 													type="number"
 													value={quantity}
 													onChange={(e) => setQuantity(e.target.value)}
+													
 												/>
 											</td>
 											<td style={{ width: "70px" }}>

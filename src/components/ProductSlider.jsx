@@ -229,7 +229,7 @@ const ProductSlider = ({ products, type }) => {
 					</div>
 					<div className="px-1"></div>
 					<div
-						className={`button-next ${isEnd ? "hidden" : ""}`}
+						className={`button-next ${isEnd || products.length <= 5 ? "hidden" : ""}`}
 						onClick={handleNextButtonClick}
 					>
 						<i className="bi bi-arrow-right fs-4"></i>

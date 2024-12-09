@@ -48,19 +48,41 @@ const ProductDetail = () => {
 
 	const handleAddRating = async () => {
 		try {
-			const data = await ratingService.addRating(user.id, product_id, rating, review, imageReview);
+			const data = await ratingService.addRating(
+				user.id,
+				product_id,
+				rating,
+				review,
+				imageReview
+			);
 			if (data) {
 				toast.success("Đăng bài đánh giá thành công.");
+				const newRating = {
+					user: user,
+					review: review,
+					ratingValue: rating,
+					img: imageReview,
+				};
+
+				setListRating((prevList) => [...prevList, newRating]);
+
+				setRating(null); // Reset sao
+				setReview(""); // Reset review
+				setImageReview(null); // Reset ảnh
 			}
 		} catch (error) {
 			toast.error("Đăng bài đánh giá thất bại.");
 			console.log("Add rating fail!", error);
-			return;
 		}
-	}
+	};
 
 	const handleSubmitRating = (e) => {
 		e.preventDefault();
+
+		if (rating === null) {
+			toast.error("Bạn cần phải chọn số sao đánh giá.");
+			return;
+		}
 
 		if (user === null) {
 			toast.error("Bạn cần đăng nhập để đăng bài viết đánh giá.");
@@ -68,19 +90,6 @@ const ProductDetail = () => {
 		}
 
 		handleAddRating();
-
-		const newRating = {
-			user: user,
-			review: review,
-			ratingValue: rating,
-			img: imageReview,
-		};
-
-		setListRating((prevList) => [...prevList, newRating]);
-
-		setRating(null); // Reset sao
-		setReview(""); // Reset review
-		setImageReview(null); // Reset ảnh
 	};
 
 	const calculateAverageRating = () => {

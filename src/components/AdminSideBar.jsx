@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import logo from "../assets/image/logo_shop.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import delivery from "../assets/image/home-delivery.png"
 
 const SideBar = () => {
 	const { admin, setAdmin } = useContext(AppContext);
@@ -120,15 +121,6 @@ const SideBar = () => {
 					Thống kê
 				</Link>
 				<Link
-					to="/admin/delivery"
-					className={`item ${
-						location.pathname.startsWith("/admin/delivery") ? "active" : ""
-					}`}
-				>
-					<i className="bi bi-truck-flatbed"></i>
-					Giao hàng
-				</Link>
-				<Link
 					to="/admin/vouchers"
 					className={`item ${
 						location.pathname.startsWith("/admin/vouchers") ? "active" : ""
@@ -136,6 +128,24 @@ const SideBar = () => {
 				>
 					<i className="bi bi-percent"></i>
 					Mã giảm giá
+				</Link>
+				<Link
+					to="/admin/shippers"
+					className={`item ${
+						location.pathname.startsWith("/admin/shippers") ? "active" : ""
+					}`}
+				>
+					<i className="bi bi-truck-front"></i>
+					Quản lý shipper
+				</Link>
+				<Link
+					to="/admin/shippingType"
+					className={`item ${
+						location.pathname.startsWith("/admin/shippingType") ? "active" : ""
+					}`}
+				>
+					<i className="bi bi-clipboard2-check-fill"></i>
+					Loại Ship
 				</Link>
 			</div>
 		</div>

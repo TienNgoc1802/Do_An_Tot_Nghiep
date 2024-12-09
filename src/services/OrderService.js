@@ -11,7 +11,7 @@ export const getAllOrder = async (page, pageSize) => {
 };
 
 export const getOrderByStatus = async (status, page, pageSize) => {
-	const res = await orderRequest.get("/orderbystatus",{
+	const res = await orderRequest.get("/orderbystatus", {
 		params: {
 			status,
 			page,
@@ -24,7 +24,7 @@ export const getOrderByStatus = async (status, page, pageSize) => {
 export const getOrderByID = async (id) => {
 	const res = await orderRequest.get(`/orderdetail/${id}`);
 	return res.data;
-}
+};
 
 export const getOrderToday = async () => {
 	const res = await orderRequest.get("/ordertoday");
@@ -37,7 +37,11 @@ export const placeOrder = async (
 	phoneNumber,
 	address,
 	paymentMethod,
-	total
+	total,
+	voucher_id,
+	shippingTypeId,
+	isPay,
+	shipper_id
 ) => {
 	const params = new URLSearchParams();
 	params.append("user_id", user_id);
@@ -46,6 +50,11 @@ export const placeOrder = async (
 	params.append("address", address);
 	params.append("paymentMethod", paymentMethod);
 	params.append("total", total);
+	params.append("voucherId", voucher_id);
+	params.append("shipping_type_id", shippingTypeId);
+	params.append("is_pay", isPay);
+	params.append("shipper_id", shipper_id);
+
 	const res = await orderRequest.post("/placeorder", params);
 	return res.data;
 };

@@ -1,10 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SideBar from "../../components/AdminSideBar";
 import ModalAddProduct from "../../components/ModalAddProductInPromotion";
 import { AppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 import * as promotionService from "../../services/PromotionService";
+import ERROR_CODES from "../../utils/errorCodes";
 
 const AddPromotion = () => {
 	const [name, setName] = useState("");
@@ -25,10 +26,28 @@ const AddPromotion = () => {
 		return total;
 	};
 
+	const validateForm = () => {
+		if (new Date(startDate) >= new Date(endDate)) {
+			toast.error(ERROR_CODES.DATE_INVALID.message);
+			return false;
+		}
+		if (discount < 0 || discount > 100 || isNaN(discount)) {
+			toast.error(ERROR_CODES.DISCOUNT_INVALID.message);
+			return false;
+		}
+		if (selectedProducts.length === 0) {
+			toast.error(ERROR_CODES.NO_SELECTED_PRODUCTS.message);
+			return false;
+		}
+		return true;
+	};
+
 	const handleAddPromotion = async (e) => {
 		e.preventDefault();
+		if (!validateForm()) return;
+
 		const productIds = selectedProducts.map((product) => product.id);
-		
+
 		try {
 			await promotionService.addPromotion(
 				name,
@@ -39,16 +58,24 @@ const AddPromotion = () => {
 				isActive,
 				productIds
 			);
-			toast.success("Thêm khuyến mãi thành công.");
+			toast.success(ERROR_CODES.ADD_PROMOTION_SUCCESS.message);
 			setSelectedProducts([]);
 			navigate("/admin/promotion");
 		} catch (error) {
-			toast.error("Thêm khuyến mãi thất bại.");
+			toast.error(ERROR_CODES.ADD_PROMOTION_FAIL.message);
 			console.error("Error response data:", error.response.data);
 			console.error("Error response status:", error.response.status);
 			console.error("Error response headers:", error.response.headers);
 		}
 	};
+
+	const isFirstRender = useRef(true);
+	useEffect(() => {
+		if (isFirstRender.current) {
+			setSelectedProducts([]);
+			isFirstRender.current = false; // Đánh dấu là đã chạy
+		}
+	}, []);
 
 	return (
 		<div>
@@ -91,6 +118,7 @@ const AddPromotion = () => {
 										placeholder="Tên khuyến mãi"
 										value={name}
 										onChange={(e) => setName(e.target.value)}
+										required
 									/>
 								</div>
 								<div className="col-12 col-lg-12 mt-3">
@@ -102,6 +130,7 @@ const AddPromotion = () => {
 										placeholder="Mô tả"
 										value={description}
 										onChange={(e) => setDescription(e.target.value)}
+										required
 									/>
 								</div>
 								<div className="col-6 col-lg-6 mt-3">
@@ -134,16 +163,17 @@ const AddPromotion = () => {
 									</label>
 									<input
 										name="discount"
-										type="text"
+										type="number"
 										className="form-control"
 										placeholder="Giảm giá"
 										value={discount}
 										onChange={(e) => setDiscount(e.target.value)}
 										min="0"
 										max="100"
+										required
 									/>
 								</div>
-								<div className="col-9 col-lg-9 mt-3">
+								{/* <div className="col-9 col-lg-9 mt-3">
 									<label className="form-label fw-bold">Trạng thái</label>
 									<div className="d-flex mt-2">
 										<div>
@@ -167,7 +197,7 @@ const AddPromotion = () => {
 											<span className="ms-2">Tạm dừng khuyến mãi</span>
 										</div>
 									</div>
-								</div>
+								</div> */}
 							</div>
 							<div>
 								<button
@@ -176,7 +206,7 @@ const AddPromotion = () => {
 									onClick={() => setIsModalOpen(true)}
 									style={{ background: "#FF6600" }}
 								>
-									Thêm sản phẩm
+									Chọn sản phẩm khuyến mãi
 								</button>
 								<table className="table table-striped add-product-table mt-3">
 									<thead>

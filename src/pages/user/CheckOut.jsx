@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/image/logo_shop.png";
 import shipper from "../../assets/image/shipper.png";
 import COD from "../../assets/image/delivery.png";
-import tranfer from "../../assets/image/mobile-transfer.png";
+import momo from "../../assets/image/momo.png";
 import success from "../../assets/image/success.png";
 import vnpay from "../../assets/image/vnpay.jpg";
 import * as cartService from "../../services/CartService";
 import * as orderService from "../../services/OrderService";
 import * as paymentService from "../../services/PaymentService";
 import * as voucherService from "../../services/VoucherService";
+import * as shippingTypeService from "../../services/ShippingTypeService";
 import toast from "react-hot-toast";
 
 const ModalSuccess = ({ isOpen }) => {
@@ -93,13 +94,16 @@ const CheckOut = () => {
 	const [fullName, setFullName] = useState(user.user_Name);
 	const [address, setAddress] = useState("");
 	const [phone, setPhone] = useState(user.phone_Number);
-	const [transportFee, setTransportFee] = useState(30000);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [codeDiscount, setCodeDiscount] = useState("");
 	const [discount, setDiscount] = useState(0);
 	const { copiedCode } = useContext(AppContext);
 	const [vouchers, setVouchers] = useState([]);
 	const [copiedVoucher, setCopiedVoucher] = useState(null);
+	const [shippingType, setShippingType] = useState([]);
+	const [shippingTypeId, setShippingTypeId] = useState(null);
+	const [transportFee, setTransportFee] = useState(null);
+	const [selectedShipping, setSelectedShipping] = useState(0);
 
 	const fetchListCart = async () => {
 		try {
@@ -120,6 +124,17 @@ const CheckOut = () => {
 		}
 	};
 
+	const fetchShippingType = async () => {
+		try {
+			const data = await shippingTypeService.getShippingType();
+			setShippingType(data);
+			setTransportFee(data[0].shipCost);
+			setShippingTypeId(data[0].id);
+		} catch (error) {
+			console.log("Fetch shipping type fail: ", error);
+		}
+	};
+
 	useEffect(() => {
 		// Lấy voucher dựa trên copiedCode
 		if (copiedCode) {
@@ -131,6 +146,7 @@ const CheckOut = () => {
 	useEffect(() => {
 		fetchListCart();
 		fetchVoucher();
+		fetchShippingType();
 	}, [totalProductInCart]);
 
 	const calculateTotal = (items) => {
@@ -241,8 +257,11 @@ const CheckOut = () => {
 		e.preventDefault();
 		let finalAddress = `${address}, ${getSelectedWardName()}, ${getSelectedDistrictName()}, ${getSelectedProvinceName()}`;
 		let finalTotal = total + transportFee - discount;
+		let voucher_id = copiedVoucher ? copiedVoucher.id : null; // null nếu không có mã giảm giá
+		let isPay = selectedPaymentMethod !== "Pay On Delivery";
+		let shipper_id = null;
 
-		if (selectedPaymentMethod == "Pay On VNPay") {
+		if (selectedPaymentMethod === "Pay On Momo") {
 			let userId = user.id;
 			const order = {
 				userId,
@@ -251,6 +270,32 @@ const CheckOut = () => {
 				finalAddress,
 				selectedPaymentMethod,
 				finalTotal,
+				voucher_id,
+				shippingTypeId,
+				isPay,
+			};
+			localStorage.setItem("order", JSON.stringify(order));
+			try {
+				const data = await paymentService.processPaymentWithMomo(finalTotal);
+				if (data) {
+					window.location.href = data;
+				}
+			} catch (error) {
+				toast.error("Đã xảy ra lỗi khi thanh toán với Momo.");
+				console.error("Error creating payment URL with Momo: ", error);
+			}
+		} else if (selectedPaymentMethod === "Pay On VNPay") {
+			let userId = user.id;
+			const order = {
+				userId,
+				fullName,
+				phone,
+				finalAddress,
+				selectedPaymentMethod,
+				finalTotal,
+				voucher_id,
+				shippingTypeId,
+				isPay,
 			};
 			localStorage.setItem("order", JSON.stringify(order));
 			try {
@@ -259,8 +304,8 @@ const CheckOut = () => {
 					window.location.href = data;
 				}
 			} catch (error) {
-				toast.error("Đã xảy ra lỗi khi thanh toán.");
-				console.error("Error creating payment URL:", error);
+				toast.error("Đã xảy ra lỗi khi thanh toán với VNPay.");
+				console.error("Error creating payment URL with VNPay: ", error);
 			}
 		} else {
 			try {
@@ -270,7 +315,10 @@ const CheckOut = () => {
 					phone,
 					finalAddress,
 					selectedPaymentMethod,
-					finalTotal
+					finalTotal,
+					voucher_id,
+					shippingTypeId,
+					isPay,
 				);
 				if (data) {
 					toast.success("Đã thanh toán thành công.");
@@ -460,117 +508,117 @@ const CheckOut = () => {
 											</div>
 										</div>
 										<div className="section-convert mt-3">
-											<h4 className="fw-bold">Phương thức vận chuyển</h4>
-											<div
-												className="d-flex justify-content-between align-items-center mt-2"
-												style={{
-													border: "1px solid darkgrey",
-													borderRadius: "3px",
-												}}
-											>
-												<div className="d-flex justify-content-start align-items-center p-2">
-													<input
-														type="radio"
-														id="shipping-rate"
-														className="mx-3"
-														checked
-													/>
-													<img src={shipper} alt="Shipper Icon"></img>
-													<span className="ms-3">Giao hàng tận nơi</span>
-												</div>
-												<span className="me-4">{`${new Intl.NumberFormat(
-													"vi-VN"
-												).format(30000)}₫`}</span>
-											</div>
+											<h4 className="fw-bold mb-2">Phương thức vận chuyển</h4>
+											{shippingType.map((item, index) => (
+												<label
+													className="d-flex justify-content-between align-items-center mb-1"
+													key={index}
+													style={{
+														border: "1px solid darkgrey",
+														borderRadius: "3px",
+														cursor: "pointer",
+													}}
+												>
+													<div className="d-flex justify-content-start align-items-center p-2">
+														<input
+															type="radio"
+															id={`shipping-rate-${index}`}
+															className="mx-3"
+															checked={selectedShipping === index}
+															onChange={() => {
+																setSelectedShipping(index);
+																setShippingTypeId(item.id);
+																setTransportFee(item.shipCost);
+															}}
+														/>
+														<img src={shipper} alt="Shipper Icon"></img>
+														<span className="ms-3">{item.shippingName}</span>
+													</div>
+													<span className="me-4">{`${new Intl.NumberFormat(
+														"vi-VN"
+													).format(item.shipCost)}₫`}</span>
+												</label>
+											))}
 										</div>
 										<div className="section-payment-method mt-4">
 											<h4 className="fw-bold">Phương thức thanh toán</h4>
-											<div
-												className=" mt-2"
-												style={{
-													border: "1px solid darkgrey",
-													borderRadius: "3px",
-												}}
-											>
-												<div className="d-flex justify-content-start align-items-center p-2">
-													<input
-														type="radio"
-														id="Pay On Delivery"
-														className="mx-3"
-														checked={
-															selectedPaymentMethod === "Pay On Delivery"
-														}
-														onChange={handlePaymentMethodChange}
-													/>
-													<img src={COD} alt="COD Icon"></img>
-													<span className="ms-3">
-														Thanh toán khi giao hàng (COD)
-													</span>
-												</div>
+											<div>
+												<label
+													className="mt-2"
+													style={{
+														border: "1px solid darkgrey",
+														borderRadius: "3px",
+														width: "100%",
+													}}
+												>
+													<div className="d-flex justify-content-start align-items-center p-2">
+														<input
+															type="radio"
+															id="Pay On Delivery"
+															className="mx-3"
+															checked={
+																selectedPaymentMethod === "Pay On Delivery"
+															}
+															onChange={handlePaymentMethodChange}
+														/>
+														<img src={COD} alt="COD Icon"></img>
+														<span className="ms-3">
+															Thanh toán khi giao hàng (COD)
+														</span>
+													</div>
+												</label>
 											</div>
-											<div
-												className="mt-1"
-												style={{
-													border: "1px solid darkgrey",
-													borderRadius: "3px",
-												}}
-											>
-												<div className="d-flex justify-content-start align-items-center p-2">
-													<input
-														type="radio"
-														id="Pay On Bank"
-														className="mx-3"
-														checked={selectedPaymentMethod === "Pay On Bank"}
-														onChange={handlePaymentMethodChange}
-													/>
-													<img src={tranfer} alt="Bank Tranfer Icon"></img>
-													<span className="ms-3">
-														Chuyển khoản qua ngân hàng
-													</span>
-												</div>
-												{selectedPaymentMethod === "Pay On Bank" && (
-													<>
-														<hr />
-														<div
-															style={{ textAlign: "center", padding: "20px" }}
-														>
-															Quí khách chuyển khoản qua ngân hàng với nội dung:
-															<br />
-															Số điện thoại + Họ Tên
-															<br />
-															<br />
-															Ngân hàng TPBank <br />
-															Số tài khoản: 0000 1762 871 <br />
-															Chủ tài khoản: Nguyễn Tiến Ngọc
-															<br />
-															<br />
-															Shoes Shop liện lạc xác nhận đơn hàng của bạn.
-														</div>
-													</>
-												)}
+											<div>
+												<label
+													className="mt-1"
+													style={{
+														border: "1px solid darkgrey",
+														borderRadius: "3px",
+														width: "100%",
+													}}
+												>
+													<div className="d-flex justify-content-start align-items-center p-2">
+														<input
+															type="radio"
+															id="Pay On Momo"
+															className="mx-3"
+															checked={selectedPaymentMethod === "Pay On Momo"}
+															onChange={handlePaymentMethodChange}
+														/>
+														<img
+															src={momo}
+															alt="Momo Icon"
+															style={{ width: "32px" }}
+														></img>
+														<span className="ms-3">Thanh toán qua Momo</span>
+													</div>
+												</label>
 											</div>
-											<div
-												className=" mt-2"
-												style={{
-													border: "1px solid darkgrey",
-													borderRadius: "3px",
-												}}
-											>
-												<div className="d-flex justify-content-start align-items-center p-2">
-													<input
-														type="radio"
-														id="Pay On VNPay"
-														className="mx-3"
-														checked={selectedPaymentMethod === "Pay On VNPay"}
-														onChange={handlePaymentMethodChange}
-													/>
-													<img
-														src={vnpay}
-														alt="VnPay Icon"
-														style={{ width: "32px" }}
-													></img>
-													<span className="ms-3">Thanh toán qua VNPay</span>
-												</div>
+											<div>
+												<label
+													className="mt-1"
+													style={{
+														border: "1px solid darkgrey",
+														borderRadius: "3px",
+														width: "100%",
+													}}
+												>
+													<div className="d-flex justify-content-start align-items-center p-2">
+														<input
+															type="radio"
+															id="Pay On VNPay"
+															className="mx-3"
+															checked={selectedPaymentMethod === "Pay On VNPay"}
+															onChange={handlePaymentMethodChange}
+														/>
+														<img
+															src={vnpay}
+															alt="VnPay Icon"
+															style={{ width: "34px" }}
+														></img>
+														<span className="ms-3">Thanh toán qua VNPay</span>
+													</div>
+												</label>
 											</div>
 											<div className="d-flex justify-content-between align-items-center mt-4">
 												<Link to="/cart">
@@ -755,7 +803,7 @@ const CheckOut = () => {
 										</span>
 										<span className="payment-due-price fs-4 fw-medium">
 											{`${new Intl.NumberFormat("vi-VN").format(
-												total + 30000 - discount
+												total + transportFee - discount
 											)}₫`}
 										</span>
 									</div>
