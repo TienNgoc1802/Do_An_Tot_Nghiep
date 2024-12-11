@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from "react";
 import {
-	BrowserRouter,
-	Routes,
-	Route,
-	useLocation,
-	useNavigate,
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
 } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
@@ -52,97 +52,103 @@ import Shipper from "./pages/admin/Shipper";
 import MoMoResponsive from "./pages/user/MoMoResponsive";
 
 const App = () => {
-	return (
-		<BrowserRouter>
-			<AppProvider>
-				<Toaster position="top-right" reverseOrder={false} />
-				<AppContent />
-			</AppProvider>
-		</BrowserRouter>
-	);
+  return (
+    <BrowserRouter>
+      <AppProvider>
+        <Toaster position="top-right" reverseOrder={false} />
+        <AppContent />
+      </AppProvider>
+    </BrowserRouter>
+  );
 };
 
 const AppContent = () => {
-	const { admin, setAdmin } = useContext(AppContext);
-	const location = useLocation();
-	const isSignInPage =
-		location.pathname === "/signin" ||
-		location.pathname === "/signup" ||
-		location.pathname === "/checkout";
-	const isAdminPage = location.pathname.startsWith("/admin");
-	const isVNPayResponsive = location.pathname.startsWith("/paywithvnpay");
-	const isMomoResponsive = location.pathname.startsWith("/paywithmomo");
-	const navigate = useNavigate();
+  const { admin, setAdmin } = useContext(AppContext);
+  const location = useLocation();
+  const isSignInPage =
+    location.pathname === "/signin" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/checkout";
+  const isAdminPage = location.pathname.startsWith("/admin");
+  const isVNPayResponsive = location.pathname.startsWith("/paywithvnpay");
+  const isMomoResponsive = location.pathname.startsWith("/paywithmomo");
+  const navigate = useNavigate();
 
-	useEffect(() => {
-		{window.scrollTo(0, 0)}
-		const storedAdmin = sessionStorage.getItem("admin");
-		if (storedAdmin) {
-			const adminData = JSON.parse(storedAdmin);
-			setAdmin(adminData);
-		}
+  useEffect(() => {
+    {
+      window.scrollTo(0, 0);
+    }
+    const storedAdmin = sessionStorage.getItem("admin");
+    if (storedAdmin) {
+      const adminData = JSON.parse(storedAdmin);
+      setAdmin(adminData);
+    } else if (isAdminPage && !admin) {
+      navigate("/admin/login");
+    }
+  }, [isAdminPage, setAdmin, location.pathname]);
 
-		else if(isAdminPage && !admin) {
-			navigate("/admin/login");
-		}
-	}, [isAdminPage, setAdmin, location.pathname]);
-
-	return (
-		<>
-			{!isSignInPage && !isAdminPage && !isVNPayResponsive && !isMomoResponsive && <Header currentPage="home" />}
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/home" element={<Home />} />
-				<Route path="/signin" element={<SignIn />} />
-				<Route path="/signup" element={<SignUp />} />
-				<Route path="/products/:product_id" element={<ProductDetail />} />
-				<Route path="/cart" element={<Cart />} />
-				<Route path="/collections/all" element={<Shop />} />
-				<Route path="/chinh-sach-bao-mat" element={<PolicySecurity />} />
-				<Route path="/qui-dinh-bao-hanh" element={<Warranty />} />
-				<Route path="/chinh-sach-doi-tra" element={<ReturnPolicy />} />
-				<Route
-					path="/chinh-sach-van-chuyen-va-kiem-hang"
-					element={<ShippingAndInspectionPolicy />}
-				/>
-				<Route path="/search" element={<Search />} />
-				<Route path="/checkout" element={<CheckOut />} />
-				<Route path="/account" element={<Account />} />
-				<Route path="/contact" element={<Contact />} />
-				<Route path="/about" element={<About/>} />
-				<Route path="/paywithvnpay" element={<VNPayResponsive />} />
-				<Route path="/paywithmomo" element={<MoMoResponsive />} />
-				<Route path="/admin/login" element={<LoginAdmin />} />
-				<Route path="/admin">
-					<Route path="dashboard" element={<Dashboard />} />
-					<Route path="category" element={<Category />} />
-					<Route path="order" element={<Order />} />
-					<Route path="order-detail/:order_id" element={<OrderDetail />} />
-					<Route path="order" element={<Order />} />
-					<Route path="users" element={<User />} />
-					<Route path="users/add-user" element={<AddUser />} />
-					<Route path="users/edit-user/:user_id" element={<EditUser />} />
-					<Route path="promotion" element={<Promotion />} />
-					<Route path="promotion/add-promotion" element={<AddPromotion />} />
-					<Route
-						path="promotion/edit-promotion/:id"
-						element={<EditPromotion />}
-					/>
-					<Route path="statistical" element={<Statistical />} />
-					<Route path="products" element={<Product />} />
-					<Route path="products/add-product" element={<AddProduct />} />
-					<Route path="products/edit-product/:id" element={<EditProduct />} />
-					<Route path="profile" element={<Profile />} />
-					<Route path="shippers" element={<Shipper />} />
-					<Route path="vouchers" element={<Voucher />} />
-					<Route path="vouchers/add-voucher" element={<AddVoucher />} />
-					<Route path="vouchers/edit-voucher/:id" element={<EditVoucher />} />
-					<Route path="shippingType" element={<ShippingType />} />
-				</Route>
-			</Routes>
-			{!isSignInPage && !isAdminPage && !isVNPayResponsive && !isMomoResponsive && <Footer />}
-		</>
-	);
+  return (
+    <>
+      {!isSignInPage &&
+        !isAdminPage &&
+        !isVNPayResponsive &&
+        !isMomoResponsive && <Header currentPage="home" />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/products/:product_id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/collections/all" element={<Shop />} />
+        <Route path="/chinh-sach-bao-mat" element={<PolicySecurity />} />
+        <Route path="/qui-dinh-bao-hanh" element={<Warranty />} />
+        <Route path="/chinh-sach-doi-tra" element={<ReturnPolicy />} />
+        <Route
+          path="/chinh-sach-van-chuyen-va-kiem-hang"
+          element={<ShippingAndInspectionPolicy />}
+        />
+        <Route path="/search" element={<Search />} />
+        <Route path="/checkout" element={<CheckOut />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/paywithvnpay" element={<VNPayResponsive />} />
+        <Route path="/paywithmomo" element={<MoMoResponsive />} />
+        <Route path="/admin/login" element={<LoginAdmin />} />
+        <Route path="/admin">
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="category" element={<Category />} />
+          <Route path="order" element={<Order />} />
+          <Route path="order-detail/:order_id" element={<OrderDetail />} />
+          <Route path="order" element={<Order />} />
+          <Route path="users" element={<User />} />
+          <Route path="users/add-user" element={<AddUser />} />
+          <Route path="users/edit-user/:user_id" element={<EditUser />} />
+          <Route path="promotion" element={<Promotion />} />
+          <Route path="promotion/add-promotion" element={<AddPromotion />} />
+          <Route
+            path="promotion/edit-promotion/:id"
+            element={<EditPromotion />}
+          />
+          <Route path="statistical" element={<Statistical />} />
+          <Route path="products" element={<Product />} />
+          <Route path="products/add-product" element={<AddProduct />} />
+          <Route path="products/edit-product/:id" element={<EditProduct />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="shippers" element={<Shipper />} />
+          <Route path="vouchers" element={<Voucher />} />
+          <Route path="vouchers/add-voucher" element={<AddVoucher />} />
+          <Route path="vouchers/edit-voucher/:id" element={<EditVoucher />} />
+          <Route path="shippingType" element={<ShippingType />} />
+        </Route>
+      </Routes>
+      {!isSignInPage &&
+        !isAdminPage &&
+        !isVNPayResponsive &&
+        !isMomoResponsive && <Footer />}
+    </>
+  );
 };
 
 export default App;
