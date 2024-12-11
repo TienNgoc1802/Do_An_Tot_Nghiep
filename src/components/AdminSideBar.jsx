@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import logo from "../assets/image/logo_shop.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
-import delivery from "../assets/image/home-delivery.png"
+import delivery from "../assets/image/home-delivery.png";
 
 const SideBar = () => {
 	const { admin, setAdmin } = useContext(AppContext);
@@ -13,7 +13,7 @@ const SideBar = () => {
 		sessionStorage.removeItem("admin");
 		setAdmin(null);
 		navigate("/admin/logout");
-	}
+	};
 
 	return (
 		<div className="menu">
@@ -73,6 +73,15 @@ const SideBar = () => {
 					}`}
 				>
 					<i className="bi bi-grid-1x2-fill"></i>
+					Danh mục sản phẩm
+				</Link>
+				<Link
+					to="/admin/brand"
+					className={`item ${
+						location.pathname.startsWith("/admin/brand") ? "active" : ""
+					}`}
+				>
+					<i className="bi bi-receipt"></i>
 					Nhãn hàng
 				</Link>
 				<Link

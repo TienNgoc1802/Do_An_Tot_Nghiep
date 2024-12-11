@@ -74,11 +74,10 @@ const ModalShippingType = ({
 				toast.error("Thêm mới loại ship thất bại");
 				console.log("Add shipping type fail: ", error);
 			}
-		}
-        else {
-            try {
+		} else {
+			try {
 				const data = await shippingTypeService.editShippingType(
-                    shippingType.id,
+					shippingType.id,
 					shippingName,
 					shipCost,
 					estimatedTime
@@ -92,7 +91,7 @@ const ModalShippingType = ({
 				toast.error("Sửa loại ship thất bại");
 				console.log("Edit shipping type fail: ", error);
 			}
-        }
+		}
 	};
 
 	return (
@@ -118,7 +117,9 @@ const ModalShippingType = ({
 					>
 						<div className="modal-content">
 							<div className="modal-header d-flex justify-content-between align-items-center">
-								<h4 className="fw-bold">Thêm loại ship</h4>
+								<h4 className="fw-bold">
+									{type === "add" ? "Thêm loại ship" : "Chỉnh sửa loại ship"}
+								</h4>
 								<button onClick={onClose} className="btn-close "></button>
 							</div>
 							<div className="modal-body" style={{ padding: "20px" }}>

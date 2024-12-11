@@ -119,7 +119,7 @@ const ModalShipper = ({ isOpen, onClose, onSuccess, type, shipper }) => {
 					>
 						<div className="modal-content">
 							<div className="modal-header d-flex justify-content-between align-items-center">
-								<h4 className="fw-bold">Thêm shipper</h4>
+								<h4 className="fw-bold">{type === "add" ? "Thêm Shipper" : "Chỉnh sửa thông tin shipper"}</h4>
 								<button onClick={onClose} className="btn-close "></button>
 							</div>
 							<div className="modal-body" style={{ padding: "20px" }}>

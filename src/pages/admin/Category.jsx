@@ -3,17 +3,17 @@ import SideBar from "../../components/AdminSideBar";
 import * as categoryService from "../../services/CategoryService";
 import toast from "react-hot-toast";
 import ModalDelete from "../../components/ModalDelete";
+import ModalAdd_EditCategory from "../../components/ModalAdd_EditCategory";
 
 const Category = () => {
 	const [page, setPage] = useState(0);
 	const [categories, setCategories] = useState(null);
-	const [showAddCategory, setShowAddCategory] = useState(false);
-	const [showEditCategory, setShowEditCategory] = useState(false);
-	const [categoryName, setCategoryName] = useState("");
+	const [isModalAdd_EditOpen, setIsModalAdd_EditOpen] = useState(false);
 	const [category, setCategory] = useState({});
 	const [selectedImage, setSelectedImage] = useState(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [sttEdit, setSTTEdit] = useState(0);
+	const [type, setType] = useState("add");
 
 	const handleImageUpload = (event) => {
 		const file = event.target.files[0];
@@ -36,8 +36,6 @@ const Category = () => {
 	};
 
 	useEffect(() => {
-		setShowEditCategory(false);
-		setShowAddCategory(false);
 		fetchCategoriesWithPagination();
 	}, [page]);
 
@@ -47,44 +45,16 @@ const Category = () => {
 		}
 	};
 
-	const handleSubmitAddCategory = async (e) => {
-		e.preventDefault();
-		try {
-			await categoryService.addCatetogry(categoryName, selectedImage);
-			fetchCategoriesWithPagination(page, 10);
-			toast.success("Thêm nhãn hàng thành công.");
-		} catch (error) {
-			toast.error("Thêm nhãn hàng thất bại.");
-			console.log("Add category fail: ", error);
-		}
-	};
-
-	const handleSubmitEditCategory = async (e) => {
-		e.preventDefault();
-		try {
-			await categoryService.editCatetogry(
-				category.id,
-				categoryName,
-				selectedImage
-			);
-			fetchCategoriesWithPagination(page, 10);
-			toast.success("Sửa nhãn hàng thành công.");
-		} catch (error) {
-			toast.error("Sửa nhãn hàng thất bại.");
-			console.log("Edit category fail: ", error);
-		}
-	};
-
 	const handleDeleteCategory = async () => {
 		if (category.product.length !== 0) {
-			toast.error("Bạn không thể xóa bỏ nhãn hàng đã có sản phẩm.");
+			toast.error("Bạn không thể xóa danh mục đã có sản phẩm.");
 			setIsModalOpen(false);
 			return;
 		} else {
 			try {
 				await categoryService.deleteCategory(category.id);
-				fetchCategoriesWithPagination(page, 10);				
-				toast.success("Xóa nhãn hàng thành công.");
+				fetchCategoriesWithPagination(page, 10);
+				toast.success("Xóa danh mục thành công.");
 				setIsModalOpen(false);
 			} catch (error) {
 				toast.error("Xóa nhãn hàng thất bại.");
@@ -99,7 +69,14 @@ const Category = () => {
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				handleDelete={handleDeleteCategory}
-				text={"Bạn có chắc chắn muốn xóa nhãn hàng này?"}
+				text={"Bạn có chắc chắn muốn xóa danh mục này?"}
+			/>
+			<ModalAdd_EditCategory
+				isOpen={isModalAdd_EditOpen}
+				onClose={() => setIsModalAdd_EditOpen(false)}
+				onSuccess={fetchCategoriesWithPagination}
+				type={type}
+				category={category}
 			/>
 			<div
 				className="dashboard"
@@ -110,17 +87,15 @@ const Category = () => {
 					className="dashboard-content"
 					style={{ padding: "15px 20px", flex: "1" }}
 				>
-					<h3 className="fw-bold mb-4">Quản Lý Nhãn Hàng</h3>
+					<h3 className="fw-bold mb-4">Quản Lý Danh Mục Sản Phẩm</h3>
 					<button
 						className="btn btn-info text-light fw-bold mb-3"
 						onClick={() => {
-							setShowEditCategory(false);
-							setShowAddCategory(true);
-							setCategoryName("");
-							setSelectedImage(null);
+							setIsModalAdd_EditOpen(true);
+							setType("add");
 						}}
 					>
-						Thêm nhãn hàng
+						Thêm danh mục
 					</button>
 					<div className="d-flex" style={{ gap: "15px" }}>
 						<div
@@ -137,7 +112,6 @@ const Category = () => {
 									<tr>
 										<th scope="col">#</th>
 										<th scope="col">Tên nhãn hàng</th>
-										<th scope="col">Ảnh nhãn hàng</th>
 										<th scope="col">Thao tác</th>
 									</tr>
 								</thead>
@@ -147,22 +121,13 @@ const Category = () => {
 											<th scope="row">#{page * 10 + index + 1}</th>
 											<td>{item.category_Name}</td>
 											<td>
-												<img
-													src={item.category_image}
-													alt="Category Image"
-													style={{ width: "60px" }}
-												/>
-											</td>
-											<td>
 												<button
 													className="btn"
 													onClick={() => {
-														setShowAddCategory(false);
-														setShowEditCategory(true);
-														setCategoryName(item.category_Name);
-														setSelectedImage(null);
 														setCategory(item);
 														setSTTEdit(page * 10 + index + 1);
+														setIsModalAdd_EditOpen(true);
+														setType("edit")
 													}}
 												>
 													<i className="bi bi-pencil-square text-info fs-5"></i>
@@ -170,8 +135,6 @@ const Category = () => {
 												<button
 													className="btn"
 													onClick={() => {
-														setShowAddCategory(false);
-														setShowEditCategory(false);
 														setIsModalOpen(true);
 														setCategory(item);
 													}}
@@ -206,158 +169,6 @@ const Category = () => {
 								</nav>
 							</div>
 						</div>
-
-						{showAddCategory && (
-							<div
-								style={{
-									background: "#fff",
-									flex: "1",
-									borderRadius: "10px",
-									padding: "15px",
-									boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-									position: "relative",
-								}}
-							>
-								<button
-									onClick={() => setShowAddCategory(false)}
-									className="btn-close"
-									style={{ position: "absolute", right: 15, top: 15 }}
-								></button>
-								<h5 className="fw-bold my-4 align-content-center">
-									Thêm nhãn hàng
-								</h5>
-								<form
-									className="form-add-category"
-									onSubmit={handleSubmitAddCategory}
-								>
-									<div className="row d-flex align-items-center mt-3">
-										<div className="col-4">
-											<label className="fw-bold">Tên nhãn hàng:</label>
-										</div>
-										<div className="col-8">
-											<input
-												name="categoryName"
-												className="form-control"
-												value={categoryName}
-												type="text"
-												onChange={(e) => setCategoryName(e.target.value)}
-												required
-											></input>
-										</div>
-									</div>
-									<div className="row d-flex align-items-center mt-3">
-										<div className="col-4">
-											<label className="fw-bold">Ảnh nhãn hàng:</label>
-										</div>
-										<div className="col-8">
-											<div>
-												<input
-													type="file"
-													name="categoryImage"
-													onChange={handleImageUpload}
-													required
-												/>
-												{selectedImage && (
-													<img
-														src={selectedImage}
-														alt="Selected"
-														accept="image/*"
-														style={{
-															maxWidth: "100px",
-															marginTop: "10px",
-														}}
-													/>
-												)}
-											</div>
-										</div>
-									</div>
-									<button
-										type="submit"
-										className="btn btn-info text-light fw-bold mt-3 py-2 px-3"
-									>
-										Thêm
-									</button>
-								</form>
-							</div>
-						)}
-
-						{showEditCategory && (
-							<div
-								style={{
-									background: "#fff",
-									flex: "1",
-									borderRadius: "10px",
-									padding: "15px",
-									boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-									position: "relative",
-								}}
-							>
-								<button
-									onClick={() => setShowEditCategory(false)}
-									className="btn-close"
-									style={{ position: "absolute", right: 15, top: 15 }}
-								></button>
-								<h5 className="fw-bold my-4 align-content-center">
-									Sửa nhãn hàng (#{sttEdit})
-								</h5>
-								<form
-									className="form-add-category"
-									onSubmit={handleSubmitEditCategory}
-								>
-									<div className="row d-flex align-items-center mt-3">
-										<div className="col-4">
-											<label className="fw-bold">Tên nhãn hàng:</label>
-										</div>
-										<div className="col-8">
-											<input
-												name="categoryName"
-												className="form-control"
-												value={categoryName}
-												type="text"
-												onChange={(e) => setCategoryName(e.target.value)}
-											></input>
-										</div>
-									</div>
-									<div className="row d-flex align-items-center mt-3">
-										<div className="col-4">
-											<label className="fw-bold">Ảnh nhãn hàng:</label>
-										</div>
-										<div className="col-8">
-											<div>
-												<input
-													type="file"
-													name="categoryImage"
-													onChange={handleImageUpload}
-												/>
-												{selectedImage ? (
-													<img
-														src={selectedImage}
-														alt="Selected"
-														accept="image/*"
-														style={{
-															maxWidth: "100px",
-															marginTop: "10px",
-														}}
-													/>
-												) : (
-													<img
-														src={category?.category_Image}
-														alt="Selected"
-														style={{ maxWidth: "100px", marginTop: "10px" }}
-													/>
-												)}
-											</div>
-										</div>
-									</div>
-									<button
-										type="submit"
-										className="btn btn-info text-light fw-bold mt-3 py-2 px-3"
-									>
-										Sửa
-									</button>
-								</form>
-							</div>
-						)}
 					</div>
 				</div>
 			</div>

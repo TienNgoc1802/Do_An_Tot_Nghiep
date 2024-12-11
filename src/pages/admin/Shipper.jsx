@@ -4,12 +4,14 @@ import * as shipperService from "../../services/ShipperService";
 import ModalDelete from "../../components/ModalDelete";
 import toast from "react-hot-toast";
 import ModalShipper from "../../components/ModalAdd_EditShipper";
+import ModalReceiveOrder from "../../components/ModalReceiveOrder";
 
 const Shipper = () => {
 	const [shippers, setShippers] = useState([]);
 	const [shipper, setShipper] = useState({});
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isModalShipperOpen, setIsModalShipperOpen] = useState(false);
+	const [isModalReceiveOrder, setIsModalReceiveOrder] = useState(false);
 	const [modalType, setModalType] = useState("add");
 
 	const fetchShippers = async () => {
@@ -58,6 +60,11 @@ const Shipper = () => {
 				type={modalType}
 				shipper={shipper}
 			/>
+			<ModalReceiveOrder
+				isOpen={isModalReceiveOrder}
+				onClose={() => setIsModalReceiveOrder(false)}
+				shipper={shipper}
+			/>
 			<div
 				className="shipper"
 				style={{ display: "flex", background: "#f5f5f5" }}
@@ -72,7 +79,7 @@ const Shipper = () => {
 						className="btn btn-info text-light fw-bold mb-3"
 						onClick={() => {
 							setIsModalShipperOpen(true);
-							setModalType("add")
+							setModalType("add");
 						}}
 					>
 						Thêm Shipper
@@ -119,6 +126,15 @@ const Shipper = () => {
 											</td>
 											<td>{item.address}</td>
 											<td>
+												<button
+													className="btn"
+													onClick={() => {
+														setIsModalReceiveOrder(true);
+														setShipper(item);
+													}}
+												>
+													<i className="bi bi-clipboard2-plus text-success fs-5"></i>
+												</button>
 												<button
 													className="btn"
 													onClick={() => {

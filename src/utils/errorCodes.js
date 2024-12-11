@@ -3,7 +3,7 @@ const ERROR_CODES = {
 
 	DATE_INVALID: {
 		code: "DATE_INVALID",
-		message: "Ngày kết thúc không được nhỏ hơn ngày bắt đầu.",
+		message: "Ngày kết thúc không được nhỏ hơn hoặc bằng ngày bắt đầu.",
 	},
 	DISCOUNT_INVALID: {
 		code: "DISCOUNT_INVALID",

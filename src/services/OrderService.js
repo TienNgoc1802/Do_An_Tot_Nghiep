@@ -76,3 +76,11 @@ export const updateStatus = async (orderId, newStatus) => {
 	);
 	return res.data;
 };
+
+export const assignShipperToOrders = async (shipperId, orderIds) => {
+	const res = await orderRequest.post(`/assign-shipper`, orderIds, {
+		params: { shipperId }, // Query parameter
+		headers: { "Content-Type": "application/json" }, // Đảm bảo gửi đúng kiểu dữ liệu
+	});
+	return res.data; // Trả về dữ liệu nếu cần
+};

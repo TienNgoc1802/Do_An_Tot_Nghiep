@@ -127,9 +127,10 @@ const CheckOut = () => {
 	const fetchShippingType = async () => {
 		try {
 			const data = await shippingTypeService.getShippingType();
-			setShippingType(data);
-			setTransportFee(data[0].shipCost);
-			setShippingTypeId(data[0].id);
+			const sortedShippingTypes = data.sort((a, b) => a.shipCost - b.shipCost);
+			setShippingType(sortedShippingTypes);
+			setTransportFee(sortedShippingTypes[0].shipCost);
+			setShippingTypeId(sortedShippingTypes[0].id);
 		} catch (error) {
 			console.log("Fetch shipping type fail: ", error);
 		}

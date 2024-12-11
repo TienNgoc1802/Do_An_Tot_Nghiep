@@ -167,9 +167,7 @@ const AddPromotion = () => {
 										className="form-control"
 										placeholder="Giảm giá"
 										value={discount}
-										onChange={(e) => setDiscount(e.target.value)}
-										min="0"
-										max="100"
+										onChange={(e) => setDiscount(e.target.value)}										
 										required
 									/>
 								</div>

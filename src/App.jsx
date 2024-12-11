@@ -50,6 +50,7 @@ import EditVoucher from "./pages/admin/EditVoucher";
 import ShippingType from "./pages/admin/ShippingType";
 import Shipper from "./pages/admin/Shipper";
 import MoMoResponsive from "./pages/user/MoMoResponsive";
+import Brand from "./pages/admin/Brand";
 
 const App = () => {
   return (
@@ -87,6 +88,7 @@ const AppContent = () => {
     }
   }, [isAdminPage, setAdmin, location.pathname]);
 
+<<<<<<< HEAD
   return (
     <>
       {!isSignInPage &&
@@ -149,6 +151,70 @@ const AppContent = () => {
         !isMomoResponsive && <Footer />}
     </>
   );
+=======
+		else if(isAdminPage && !admin) {
+			navigate("/admin/login");
+		}
+	}, [isAdminPage, setAdmin, location.pathname]);
+
+	return (
+		<>
+			{!isSignInPage && !isAdminPage && !isVNPayResponsive && !isMomoResponsive && <Header currentPage="home" />}
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/home" element={<Home />} />
+				<Route path="/signin" element={<SignIn />} />
+				<Route path="/signup" element={<SignUp />} />
+				<Route path="/products/:product_id" element={<ProductDetail />} />
+				<Route path="/cart" element={<Cart />} />
+				<Route path="/collections/all" element={<Shop />} />
+				<Route path="/chinh-sach-bao-mat" element={<PolicySecurity />} />
+				<Route path="/qui-dinh-bao-hanh" element={<Warranty />} />
+				<Route path="/chinh-sach-doi-tra" element={<ReturnPolicy />} />
+				<Route
+					path="/chinh-sach-van-chuyen-va-kiem-hang"
+					element={<ShippingAndInspectionPolicy />}
+				/>
+				<Route path="/search" element={<Search />} />
+				<Route path="/checkout" element={<CheckOut />} />
+				<Route path="/account" element={<Account />} />
+				<Route path="/contact" element={<Contact />} />
+				<Route path="/about" element={<About/>} />
+				<Route path="/paywithvnpay" element={<VNPayResponsive />} />
+				<Route path="/paywithmomo" element={<MoMoResponsive />} />
+				<Route path="/admin/login" element={<LoginAdmin />} />
+				<Route path="/admin">
+					<Route path="dashboard" element={<Dashboard />} />
+					<Route path="category" element={<Category />} />
+					<Route path="brand" element={<Brand />} />
+					<Route path="order" element={<Order />} />
+					<Route path="order-detail/:order_id" element={<OrderDetail />} />
+					<Route path="order" element={<Order />} />
+					<Route path="users" element={<User />} />
+					<Route path="users/add-user" element={<AddUser />} />
+					<Route path="users/edit-user/:user_id" element={<EditUser />} />
+					<Route path="promotion" element={<Promotion />} />
+					<Route path="promotion/add-promotion" element={<AddPromotion />} />
+					<Route
+						path="promotion/edit-promotion/:id"
+						element={<EditPromotion />}
+					/>
+					<Route path="statistical" element={<Statistical />} />
+					<Route path="products" element={<Product />} />
+					<Route path="products/add-product" element={<AddProduct />} />
+					<Route path="products/edit-product/:id" element={<EditProduct />} />
+					<Route path="profile" element={<Profile />} />
+					<Route path="shippers" element={<Shipper />} />
+					<Route path="vouchers" element={<Voucher />} />
+					<Route path="vouchers/add-voucher" element={<AddVoucher />} />
+					<Route path="vouchers/edit-voucher/:id" element={<EditVoucher />} />
+					<Route path="shippingType" element={<ShippingType />} />
+				</Route>
+			</Routes>
+			{!isSignInPage && !isAdminPage && !isVNPayResponsive && !isMomoResponsive && <Footer />}
+		</>
+	);
+>>>>>>> 699ef57 (9 update)
 };
 
 export default App;

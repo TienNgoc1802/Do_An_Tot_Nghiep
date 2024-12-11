@@ -13,6 +13,7 @@ const Order = () => {
 	const [pendingOrder, setPendingOrder] = useState(null);
 	const [completedOrder, setCompletedOrder] = useState(null);
 	const [canceledOrder, setCanceledOrder] = useState(null);
+	const [waitingOrder, setWaitingOrder] = useState(null);
 	const [page, setPage] = useState(0);
 
 	const fecthAllOrder = async () => {
@@ -62,6 +63,15 @@ const Order = () => {
 			console.log("Fetch canceled order fail: ", error);
 		}
 	};
+	const fecthWaitingOrder = async () => {
+		try {
+			const data = await orderService.getOrderByStatus("Waiting", page, 10);
+			if (selectedStatus === "Waiting") setOrder(data.content);
+			setWaitingOrder(data.totalElements);
+		} catch (error) {
+			console.log("Fetch waiting order fail: ", error);
+		}
+	};
 
 	useEffect(() => {
 		fecthAllOrder();
@@ -69,11 +79,15 @@ const Order = () => {
 		fecthDeliveringOrder();
 		fecthCompletedOrder();
 		fecthCanceledOrder();
+		fecthWaitingOrder();
 	}, [page, selectedStatus]);
 
 	const handleStatus = (status) => {
 		switch (status) {
 			case "Pending":
+				return "warning";
+				break;
+			case "Waiting":
 				return "warning";
 				break;
 			case "Completed":
@@ -257,6 +271,18 @@ const Order = () => {
 							cursor: "pointer",
 							fontWeight: "bold",
 							textDecoration:
+								selectedStatus === "Waiting" ? "underline" : "none",
+						}}
+						onClick={() => setSelectedStatus("Waiting")}
+					>
+						Chờ lấy hàng({waitingOrder})
+					</span>
+					<span className="mx-1 fw-bold">|</span>
+					<span
+						style={{
+							cursor: "pointer",
+							fontWeight: "bold",
+							textDecoration:
 								selectedStatus === "Delivering" ? "underline" : "none",
 						}}
 						onClick={() => setSelectedStatus("Delivering")}
@@ -305,7 +331,9 @@ const Order = () => {
 									<th scope="col">Tên người nhận</th>
 									<th scope="col">Số điện thoại</th>
 									<th scope="col">Ngày đặt</th>
-									<th scope="col" style={{width: "10%"}}>Phương thức thanh toán</th>
+									<th scope="col" style={{ width: "10%" }}>
+										Phương thức thanh toán
+									</th>
 									<th scope="col">Trạng thái</th>
 									<th scope="col">Tổng tiền</th>
 									<th scope="col">Thao tác</th>
@@ -336,6 +364,8 @@ const Order = () => {
 											>
 												{item.status === "Pending"
 													? "Chờ xác nhận"
+													: item.status === "Waiting"
+													? "Chờ lấy hàng"
 													: item.status === "Delivering"
 													? "Đang giao hàng"
 													: item.status === "Completed"

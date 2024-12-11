@@ -10,44 +10,23 @@ export const getCategoryWithPagination = async (page, pageSize) => {
 	return res.data;
 };
 
-export const addCatetogry = async (name, image) => {
-	const formData = new FormData();
-	formData.append("categoryName", name);
-	if (image) {
-		const response = await fetch(image);
-		const blob = await response.blob();
-		formData.append("categoryImage", blob, "category.jpg");
-	}
+export const addCatetogry = async (name) => {
+	const params = new URLSearchParams();
+	params.append("categoryName", name);
+	const res = await categroyRequest.post("/add", params);
 
-	const res = await categroyRequest.post("/add", formData, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-	});
-
-    return res.data;
+	return res.data;
 };
 
-export const editCatetogry = async (id, name, image) => {
-	const formData = new FormData();
-	formData.append("categoryName", name);
-	if (image) {
-		const response = await fetch(image);
-		const blob = await response.blob();
-		formData.append("categoryImage", blob, "category.jpg");
-	}
-
-	const res = await categroyRequest.put(`/edit/${id}`, formData, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
+export const editCatetogry = async (id, name) => {
+	const response = await categroyRequest.put(`/edit/${id}`, null, {
+		params: { categoryName: name }, 
 	});
 
-    return res.data;
+	return response.data;
 };
 
 export const deleteCategory = async (id) => {
-    const res = await categroyRequest.delete(`/delete/${id}`);
-    return res.data;
-}
-
+	const res = await categroyRequest.delete(`/delete/${id}`);
+	return res.data;
+};

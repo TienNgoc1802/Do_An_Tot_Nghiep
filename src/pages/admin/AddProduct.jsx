@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import * as productService from "../../services/ProductService";
 import * as categoryServie from "../../services/CategoryService";
+import * as brandService from "../../services/BrandService";
 import { Editor } from "@tinymce/tinymce-react";
 import ERROR_CODES from "../../utils/errorCodes";
 
@@ -14,6 +15,8 @@ const AddProduct = () => {
 	const [isActive, setIsActice] = useState(1);
 	const [categoryID, setCategoryID] = useState("");
 	const [categories, setCategories] = useState([]);
+	const [brands, setBrands] = useState([]);
+	const [brandID, setBrandID] = useState("");
 	const [sizes, setSizes] = useState([]);
 	const [images, setImages] = useState([]);
 	const [size, setSize] = useState(35);
@@ -74,7 +77,17 @@ const AddProduct = () => {
 		}
 	};
 
+	const fetchBrands = async () => {
+		try {
+			const data = await brandService.getAllBrands();
+			setBrands(data);
+		} catch (error) {
+			console.log("Fetch brands fail: ", error);
+		}
+	};
+
 	useEffect(() => {
+		fetchBrands();
 		fetchCategories();
 	}, []);
 
@@ -235,17 +248,33 @@ const AddProduct = () => {
 								/>
 							</div>
 							<div className="col-4 col-lg-4 mt-3">
-								<label className="form-label fw-bold">Nhãn hàng</label>
+								<label className="form-label fw-bold">Danh mục sản phẩm</label>
 								<select
 									className="form-select"
 									value={categoryID}
 									onChange={(e) => setCategoryID(e.target.value)}
 									required
 								>
-									<option value="">Chọn nhãn hàng</option>
+									<option value="">Chọn danh mục</option>
 									{categories?.map((category) => (
 										<option key={category.id} value={category.id}>
 											{category.category_Name}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="col-4 col-lg-4 mt-3">
+								<label className="form-label fw-bold">Nhãn hàng</label>
+								<select
+									className="form-select"
+									value={brandID}
+									onChange={(e) => setBrandID(e.target.value)}
+									required
+								>
+									<option value="">Chọn nhãn hàng</option>
+									{brands?.map((brand) => (
+										<option key={brand.id} value={brand.id}>
+											{brand.brand_name}
 										</option>
 									))}
 								</select>
